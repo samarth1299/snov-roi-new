@@ -415,16 +415,20 @@ footer a:hover{color:var(--pu)}
   <div class="logo-name">snov<span>.</span>io</div>
   <div class="logo-sep"></div>
   <div class="logo-tag">ROI Calculator</div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:0;background:var(--s2);border:1px solid var(--b1);border-radius:100px;padding:3px" id="langToggle">
+    <button onclick="setLang('en')" id="langEN" style="font-size:11px;font-weight:700;padding:5px 13px;border-radius:100px;border:none;background:var(--s1);color:var(--pu);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 1px 3px rgba(91,52,217,0.12)">EN</button>
+    <button onclick="setLang('pt')" id="langPT" style="font-size:11px;font-weight:700;padding:5px 13px;border-radius:100px;border:none;background:transparent;color:var(--td);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">PT</button>
+  </div>
 </div>
 
 <!-- PROGRESS -->
 <div class="prog-outer">
   <div class="prog-steps">
-    <div class="pstep active" id="ps1"><div class="pnum">1</div><span>Your pipeline</span></div>
+    <div class="pstep active" id="ps1"><div class="pnum">1</div><span data-i18n="step1">Your pipeline</span></div>
     <div class="pline" id="pl1"></div>
-    <div class="pstep" id="ps2"><div class="pnum">2</div><span>Possible revenue</span></div>
+    <div class="pstep" id="ps2"><div class="pnum">2</div><span data-i18n="step2">Possible revenue</span></div>
     <div class="pline" id="pl2"></div>
-    <div class="pstep" id="ps3"><div class="pnum">3</div><span>Plan &amp; ROI</span></div>
+    <div class="pstep" id="ps3"><div class="pnum">3</div><span data-i18n="step3">Plan &amp; ROI</span></div>
   </div>
   <div class="prog-track"><div class="prog-bar" id="progBar" style="width:33%"></div></div>
 </div>
@@ -432,53 +436,53 @@ footer a:hover{color:var(--pu)}
 <!-- ══════════════ STEP 1 ══════════════ -->
 <div class="screen active" id="step1">
   <div class="hero">
-    <div class="eyebrow"><div class="edot"></div>2-minute calculator</div>
-    <h1>How much could<br/><em>Snov.io make you?</em></h1>
-    <p class="hero-sub">Tell us roughly what your outreach looks like. We'll handle the math.</p>
+    <div class="eyebrow"><div class="edot"></div><span data-i18n="eyebrow">2-minute calculator</span></div>
+    <h1><span data-i18n="h1a">How much could</span><br/><em data-i18n="h1b">Snov.io make you?</em></h1>
+    <p class="hero-sub" data-i18n="herosub">Tell us roughly what your outreach looks like. We'll handle the math.</p>
   </div>
 
   <!-- Leads -->
   <div class="card" style="margin-bottom:12px">
     <div class="card-top" style="margin-bottom:4px">
-      <div class="card-label">How many leads do you reach out to per month?</div>
+      <div class="card-label" data-i18n="leadsQ">How many leads do you reach out to per month?</div>
       <div class="sl-val" id="lblLeads">300</div>
     </div>
     <input type="range" id="rLeads" min="10" max="50000" step="100" value="300" oninput="rSync('rLeads','iLeads','lblLeads',fN);updateTrack(this);syncNewLeads();calcJourney()"/>
     <div style="margin-top:6px">
       <input type="number" id="iLeads" value="300" min="1" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;background:transparent;border:none;outline:none;color:var(--tx);width:140px;-moz-appearance:textfield" oninput="sSync('iLeads','rLeads','lblLeads',fN)"/>
-      <span style="font-size:13px;color:var(--td)">leads/mo</span>
+      <span style="font-size:13px;color:var(--td)" data-i18n="leadsMo">leads/mo</span>
     </div>
     <!-- new leads vs existing — collapsed disclosure -->
     <div style="margin-top:10px">
       <div style="font-size:11px;color:var(--td);cursor:pointer;display:inline-flex;align-items:center;gap:4px;user-select:none" onclick="toggleNewLeadsSplit()" id="newLeadsToggle">
-        <span id="newLeadsSplitArrow">▸</span> Sourcing all leads fresh? <span style="color:var(--pu);font-weight:600">Adjust credits split</span>
+        <span id="newLeadsSplitArrow">▸</span> <span data-i18n="creditsSplit">Sourcing all leads fresh? </span><span style="color:var(--pu);font-weight:600" data-i18n="adjustSplit">Adjust credits split</span>
       </div>
       <div id="newLeadsSplitPanel" style="display:none;margin-top:8px;padding:10px 12px;background:var(--s2);border-radius:9px">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <div style="font-size:12px;color:var(--tm)">New leads found via Snov.io:</div>
+          <div style="font-size:12px;color:var(--tm)" data-i18n="newLeadsLabel">New leads found via Snov.io:</div>
           <input class="iinp" type="number" id="iNewLeads" value="300" min="0" style="width:80px;font-size:14px" oninput="syncNewLeads()"/>
           <div style="font-size:12px;color:var(--td)" id="newLeadsNote">300 credits/mo</div>
         </div>
-        <div style="font-size:11px;color:var(--td);margin-top:5px">Rest come from your existing contacts list — no credits used.</div>
+        <div style="font-size:11px;color:var(--td);margin-top:5px" data-i18n="existingContacts">Rest come from your existing contacts list — no credits used.</div>
       </div>
     </div>
   </div>
 
   <!-- JOURNEY — compact, sliders embedded -->
   <div class="card" style="margin-bottom:12px">
-    <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--td);margin-bottom:16px">Your outreach funnel</div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--td);margin-bottom:16px" data-i18n="funnelTitle">Your outreach funnel</div>
     <div class="journey-h" id="journey">
       <div class="jh-step">
         <div class="jh-node filled">✉</div>
         <div class="jh-body">
-          <div class="jh-title">Leads</div>
+          <div class="jh-title" data-i18n="jLeads">Leads</div>
           <div class="jh-val" id="jv1">300</div>
         </div>
       </div>
       <div class="jh-step">
         <div class="jh-node" id="jc2">↩</div>
         <div class="jh-body">
-          <div class="jh-title">Replies</div>
+          <div class="jh-title" data-i18n="jReplies">Replies</div>
           <div class="jh-val" id="jv2">3</div>
           <div class="jh-inp-row"><input type="number" class="rate-inp" id="jrate2" value="1" min="0.1" max="50" step="0.1" oninput="syncRateInp('jrate2','rReply')"/>%</div>
           <div class="jh-rate"><input type="range" id="rReply" min="0.1" max="50" step="0.1" value="1" oninput="syncRateSlider('rReply','jrate2');updateTrack(this);calcJourney()"/></div>
@@ -487,7 +491,7 @@ footer a:hover{color:var(--pu)}
       <div class="jh-step">
         <div class="jh-node" id="jc3">📅</div>
         <div class="jh-body">
-          <div class="jh-title">Meetings</div>
+          <div class="jh-title" data-i18n="jMeetings">Meetings</div>
           <div class="jh-val" id="jv3">0</div>
           <div class="jh-inp-row"><input type="number" class="rate-inp" id="jrate3" value="30" min="0.1" max="80" step="0.1" oninput="syncRateInp('jrate3','rMeet')"/>%</div>
           <div class="jh-rate"><input type="range" id="rMeet" min="0.1" max="80" step="0.1" value="30" oninput="syncRateSlider('rMeet','jrate3');updateTrack(this);syncLiMeet();calcJourney()"/></div>
@@ -496,7 +500,7 @@ footer a:hover{color:var(--pu)}
       <div class="jh-step">
         <div class="jh-node" id="jc4">🏆</div>
         <div class="jh-body">
-          <div class="jh-title">Deals won</div>
+          <div class="jh-title" data-i18n="jDeals">Deals won</div>
           <div class="jh-val" id="jv4">0</div>
           <div class="jh-inp-row"><input type="number" class="rate-inp" id="jrate4" value="20" min="0.1" max="80" step="0.1" oninput="syncRateInp('jrate4','rClose')"/>%</div>
           <div class="jh-rate"><input type="range" id="rClose" min="0.1" max="80" step="0.1" value="20" oninput="syncRateSlider('rClose','jrate4');updateTrack(this);calcJourney()"/></div>
@@ -506,19 +510,19 @@ footer a:hover{color:var(--pu)}
     <!-- emails per lead + mailbox — collapsed disclosure -->
     <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--b0)">
       <div style="font-size:11px;color:var(--td);cursor:pointer;display:inline-flex;align-items:center;gap:4px;user-select:none" onclick="toggleSeqPanel()" id="seqPanelToggle">
-        <span id="seqPanelArrow">▸</span> Using a 4-email sequence · 50/mailbox/day <span style="color:var(--pu);font-weight:600">Change</span>
+        <span id="seqPanelArrow">▸</span> <span data-i18n="seqSummary">Using a 4-email sequence · 50/mailbox/day</span> <span style="color:var(--pu);font-weight:600" data-i18n="changeBtn">Change</span>
       </div>
       <div id="seqPanel" style="display:none;margin-top:10px">
         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
           <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tm)">
             Sequence:
             <input type="range" id="rSeq" min="1" max="12" step="1" value="4" style="width:80px" oninput="lbl('rSeq','lblSeq');updateTrack(this);updateSeqSummary();calcJourney()"/>
-            <strong><span id="lblSeq">4</span> emails/lead</strong>
+            <strong><span id="lblSeq">4</span> <span data-i18n="emailsPerLead">emails/lead</span></strong>
           </div>
           <div class="mb-inline" id="mbInlineBlock" style="margin-top:0;flex:1;min-width:180px">
-            <div class="mb-inline-txt">Total emails/mo: <strong id="totalMail">1,200</strong></div>
+            <div class="mb-inline-txt"><span data-i18n="totalEmails">Total emails/mo:</span> <strong id="totalMail">1,200</strong></div>
             <div class="mb-inline-edit">
-              <label>Max/mailbox/day:</label>
+              <label data-i18n="maxPerMb">Max/mailbox/day:</label>
               <input class="iinp" type="number" id="iMbLimit" value="50" min="10" max="500" oninput="calcJourney();checkMbLimit();updateSeqSummary()"/>
             </div>
           </div>
@@ -532,8 +536,8 @@ footer a:hover{color:var(--pu)}
   <div class="card" style="margin-bottom:12px">
     <div class="li-toggle-row" style="margin-bottom:0">
       <div>
-        <div class="li-toggle-label">Add LinkedIn Automation <span class="li-badge">$69/mo per slot</span></div>
-        <div class="li-toggle-sub">LI outreach on the same leads — boosts meeting rate.</div>
+        <div class="li-toggle-label"><span data-i18n="liTitle">Add LinkedIn Automation</span> <span class="li-badge">$69/mo per slot</span></div>
+        <div class="li-toggle-sub" data-i18n="liSub">LI outreach on the same leads — boosts meeting rate.</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="liToggle" onchange="toggleLI()"/>
@@ -545,8 +549,8 @@ footer a:hover{color:var(--pu)}
         <!-- Slots stepper -->
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap">
           <div>
-            <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px">LinkedIn slots</div>
-            <div style="font-size:11px;color:var(--tm)">Each slot = 1 LinkedIn account</div>
+            <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px" data-i18n="liSlots">LinkedIn slots</div>
+            <div style="font-size:11px;color:var(--tm)" data-i18n="liSlotSub">Each slot = 1 LinkedIn account</div>
           </div>
           <div style="display:flex;align-items:center;gap:0;background:var(--s2);border:1px solid var(--b1);border-radius:9px;overflow:hidden">
             <button class="slot-btn" onclick="changeS1LiSlots(-1)">−</button>
@@ -559,7 +563,7 @@ footer a:hover{color:var(--pu)}
         <!-- LI lead count (number, not %) -->
         <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <div style="font-size:12px;color:var(--tm);flex:1">
-            How many of your <strong id="liLeadsTotalRef">300</strong> leads also get LinkedIn outreach?
+            <span data-i18n='d_liLeadsQ'>How many of your</span> <strong id="liLeadsTotalRef">300</strong> <span data-i18n='d_liLeadsQ2'>leads also get LinkedIn outreach?</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <input class="iinp" type="number" id="iLiLeads" value="60" min="0" style="width:80px;font-size:16px" oninput="syncLiLeadCount()"/>
@@ -572,15 +576,15 @@ footer a:hover{color:var(--pu)}
           <div style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--td);margin-bottom:10px">LI conversion rates <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--td);font-size:10px">(editable)</span></div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
             <div style="text-align:center">
-              <div style="font-size:10px;color:var(--td);margin-bottom:4px">Accept rate</div>
+              <div style="font-size:10px;color:var(--td);margin-bottom:4px" data-i18n="liAccept">Accept rate</div>
               <div><input type="number" class="rate-inp" id="ljrate_accept" value="30" min="1" max="80" step="1" style="font-size:20px;width:3.5ch;text-align:center" oninput="calcJourney()"/>%</div>
             </div>
             <div style="text-align:center">
-              <div style="font-size:10px;color:var(--td);margin-bottom:4px">Reply rate</div>
+              <div style="font-size:10px;color:var(--td);margin-bottom:4px" data-i18n="liReply">Reply rate</div>
               <div><input type="number" class="rate-inp" id="ljrate_reply" value="10" min="0.1" max="50" step="0.1" style="font-size:20px;width:3.5ch;text-align:center" oninput="calcJourney()"/>%</div>
             </div>
             <div style="text-align:center">
-              <div style="font-size:10px;color:var(--td);margin-bottom:4px">Meeting rate</div>
+              <div style="font-size:10px;color:var(--td);margin-bottom:4px" data-i18n="liMeeting">Meeting rate</div>
               <div><input type="number" class="rate-inp" id="ljrate_meet" value="20" min="0.1" max="80" step="0.1" style="font-size:20px;width:3.5ch;text-align:center" oninput="calcJourney()"/>%</div>
             </div>
           </div>
@@ -615,40 +619,40 @@ footer a:hover{color:var(--pu)}
   <span id="lblCycle" style="display:none">14</span>
   <div id="cycleNote" style="display:none"></div>
 
-  <button class="btn-main" onclick="goReveal()">Show my possible revenue →</button>
+  <button class="btn-main" onclick="goReveal()" data-i18n="revealBtn">Show my possible revenue →</button>
 </div>
 
 <!-- ══════════════ STEP 2 ══════════════ -->
 <div class="screen" id="step2">
   <div class="rev-head">
-    <h2>Your possible revenue 🚀</h2>
-    <p>Based on your funnel — this is what consistent outreach with Snov.io could generate each month.</p>
+    <h2 data-i18n="s2h2">Your possible revenue 🚀</h2>
+    <p data-i18n="s2sub">Based on your funnel — this is what consistent outreach with Snov.io could generate each month.</p>
   </div>
 
   <div class="big-stat">
-    <div class="bs-label">Possible monthly revenue</div>
+    <div class="bs-label" data-i18n="bsLabel">Possible monthly revenue</div>
     <div class="bs-num"><span class="bs-dollar">$</span><span id="bsRevNum">0</span></div>
     <div class="bs-sub" id="bsSub">—</div>
   </div>
 
   <!-- Funnel flow boxes -->
   <div class="funnel-flow">
-    <div class="ff-title">Your funnel at a glance</div>
+    <div class="ff-title" data-i18n="ffTitle">Your funnel at a glance</div>
     <div class="ff-steps" id="ffSteps">
       <div class="ff-step">
-        <div class="ff-box active"><div class="ff-box-num" id="ff1">—</div><div class="ff-box-lbl">Leads reached</div></div>
+        <div class="ff-box active"><div class="ff-box-num" id="ff1">—</div><div class="ff-box-lbl" data-i18n="ffLeads">Leads reached</div></div>
       </div>
       <div class="ff-arrow">→</div>
       <div class="ff-step">
-        <div class="ff-box"><div class="ff-box-num" id="ff2">—</div><div class="ff-box-lbl">Replies</div><div class="ff-box-rate" id="ffr2">—</div></div>
+        <div class="ff-box"><div class="ff-box-num" id="ff2">—</div><div class="ff-box-lbl" data-i18n="ffReplies">Replies</div><div class="ff-box-rate" id="ffr2">—</div></div>
       </div>
       <div class="ff-arrow">→</div>
       <div class="ff-step">
-        <div class="ff-box"><div class="ff-box-num" id="ff3">—</div><div class="ff-box-lbl">Meetings</div><div class="ff-box-rate" id="ffr3">—</div></div>
+        <div class="ff-box"><div class="ff-box-num" id="ff3">—</div><div class="ff-box-lbl" data-i18n="ffMeetings">Meetings</div><div class="ff-box-rate" id="ffr3">—</div></div>
       </div>
       <div class="ff-arrow">→</div>
       <div class="ff-step">
-        <div class="ff-box active"><div class="ff-box-num" id="ff4">—</div><div class="ff-box-lbl">Deals won</div><div class="ff-box-rate" id="ffr4">—</div></div>
+        <div class="ff-box active"><div class="ff-box-num" id="ff4">—</div><div class="ff-box-lbl" data-i18n="ffDeals">Deals won</div><div class="ff-box-rate" id="ffr4">—</div></div>
       </div>
     </div>
   </div>
@@ -675,10 +679,10 @@ footer a:hover{color:var(--pu)}
       </div>
     </div>
     <div class="adv-roi-open" id="advRoiOpen" style="display:none">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--pu);margin-bottom:14px">Advanced ROI inputs</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--pu);margin-bottom:14px" data-i18n="advTitle">Advanced ROI inputs</div>
       <!-- Deal value -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-        <div style="font-size:13px;font-weight:600;color:var(--tx);min-width:120px">Average deal value</div>
+        <div style="font-size:13px;font-weight:600;color:var(--tx);min-width:120px" data-i18n="dealVal">Average deal value</div>
         <div style="display:flex;align-items:baseline;gap:4px;flex:1">
           <div style="font-size:20px;font-weight:700;color:var(--td)">$</div>
           <input class="bnum-inp" type="number" id="iDeal2" value="3000" min="1" style="font-size:28px;width:120px" oninput="syncDeal2()"/>
@@ -688,14 +692,14 @@ footer a:hover{color:var(--pu)}
       </div>
       <!-- Closing cycle -->
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-        <div style="font-size:13px;font-weight:600;color:var(--tx);min-width:120px">Sales closing cycle</div>
+        <div style="font-size:13px;font-weight:600;color:var(--tx);min-width:120px" data-i18n="closeCycle">Sales closing cycle</div>
         <div style="display:flex;align-items:center;gap:8px;flex:1">
           <input type="range" id="rCycle2" min="1" max="90" step="1" value="14" style="flex:1;min-width:120px" oninput="syncCycle2()"/>
           <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--pu);min-width:56px;text-align:right"><span id="lblCycle2">14</span>d</div>
         </div>
       </div>
       <div style="font-size:11px;color:var(--td);margin-top:8px" id="cycleNote2"></div>
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--b0);font-size:12px;color:var(--tm)">↑ The possible revenue figure above updates live as you adjust these.</div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--b0);font-size:12px;color:var(--tm)" data-i18n="advNote">↑ The possible revenue figure above updates live as you adjust these.</div>
     </div>
   </div>
 
@@ -705,31 +709,31 @@ footer a:hover{color:var(--pu)}
       <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
     </div>
     <div class="mb-body-wrap" style="flex:1">
-      <div class="mb-title">Minimum mailboxes you'll need</div>
+      <div class="mb-title" data-i18n="mbTitle">Minimum mailboxes you'll need</div>
       <div class="mb-desc" id="mbDesc">Calculating…</div>
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:8px">
         <div class="mb-pill">
           <div class="mb-pill-num" id="mbCount">2</div>
-          <div class="mb-pill-txt">mailboxes minimum</div>
+          <div class="mb-pill-txt" data-i18n="mbMin">mailboxes minimum</div>
         </div>
-        <div style="font-size:12px;color:var(--tm);line-height:1.6">Spread across domains for<br/>better deliverability</div>
+        <div style="font-size:12px;color:var(--tm);line-height:1.6" data-i18n="mbSpread">Spread across domains for better deliverability</div>
       </div>
     </div>
   </div>
 
 
 
-  <button class="btn-main" onclick="goPlan()" style="margin-top:14px">See my plan &amp; ROI →</button>
-  <div style="text-align:center;margin-top:12px"><button class="btn-ghost" onclick="goStep(1)">← Adjust numbers</button></div>
+  <button class="btn-main" onclick="goPlan()" style="margin-top:14px" data-i18n="planBtn">See my plan &amp; ROI →</button>
+  <div style="text-align:center;margin-top:12px"><button class="btn-ghost" onclick="goStep(1)" data-i18n="adjustBtn">← Adjust numbers</button></div>
 </div>
 
 <!-- ══════════════ STEP 3 ══════════════ -->
 <div class="screen" id="step3">
   <div class="plan-head">
-    <h2>Your recommended plan 🎯</h2>
-    <p>Matched to your lead volume &amp; team. Flip the card to compare all plans &amp; billing cycles.</p>
+    <h2 data-i18n="s3h2">Your recommended plan 🎯</h2>
+    <p data-i18n="s3sub">Matched to your lead volume &amp; team. Flip the card to compare all plans &amp; billing cycles.</p>
   </div>
-  <div style="text-align:center"><div class="rec-badge">✦ Best match for your usage</div></div>
+  <div style="text-align:center"><div class="rec-badge" data-i18n="recBadge">✦ Best match for your usage</div></div>
 
   <!-- ROI FIRST — flip card (back visible only after typing "snov") -->
   <div style="perspective:1200px;margin-bottom:14px" id="roiFlipScene">
@@ -743,22 +747,22 @@ footer a:hover{color:var(--pu)}
           <div id="roiHlSub" style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:5px">for every $1 spent</div>
           <div id="roiDiscourage" style="display:none;margin-top:8px;font-size:11px;color:var(--am);line-height:1.5;max-width:200px"></div>
           <!-- subtle hint only when snov mode active -->
-          <div id="roiFlipHint" style="display:none;margin-top:10px;font-size:10px;color:rgba(255,255,255,0.25);cursor:pointer" onclick="flipRoiCard()">↺ tap for breakdown</div>
+          <div id="roiFlipHint" data-i18n="flipHint" style="display:none;margin-top:10px;font-size:10px;color:rgba(255,255,255,0.25);cursor:pointer" onclick="flipRoiCard()">↺ tap for breakdown</div>
         </div>
         <div class="roi-hero-right">
           <div class="rb-rows">
             <div class="rb-row">
-              <div class="rb-lbl">Possible rev.</div>
+              <div class="rb-lbl" data-i18n="rbRev">Possible rev.</div>
               <div class="rb-track"><div class="rb-fill pu" id="rbRev" style="width:0%"></div></div>
               <div class="rb-amt" id="rbRevAmt">—</div>
             </div>
             <div class="rb-row">
-              <div class="rb-lbl">Plan cost</div>
+              <div class="rb-lbl" data-i18n="rbCost">Plan cost</div>
               <div class="rb-track"><div class="rb-fill td" id="rbCost" style="width:0%"></div></div>
               <div class="rb-amt" id="rbCostAmt">—</div>
             </div>
             <div class="rb-row">
-              <div class="rb-lbl">Net value</div>
+              <div class="rb-lbl" data-i18n="rbNet">Net value</div>
               <div class="rb-track"><div class="rb-fill gr" id="rbNet" style="width:0%"></div></div>
               <div class="rb-amt" id="rbNetAmt">—</div>
             </div>
@@ -768,7 +772,7 @@ footer a:hover{color:var(--pu)}
 
       <!-- BACK: ROI breakdown explanation -->
       <div onclick="flipRoiCard()" style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);border-radius:18px;background:linear-gradient(150deg,#1A0E42,#2D1B6B);padding:22px 24px;box-shadow:0 8px 40px rgba(91,52,217,0.22);overflow:auto">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px">Why this ROI</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px" data-i18n="whyRoi">Why this ROI</div>
         <div id="roiBreakdownContent" style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.7"></div>
         <div style="margin-top:16px;font-size:10px;color:rgba(255,255,255,0.2);cursor:pointer" onclick="flipRoiCard()">↺ flip back</div>
       </div>
@@ -780,10 +784,10 @@ footer a:hover{color:var(--pu)}
   <div style="margin-bottom:12px">
     <div class="card" style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px">
       <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--td);margin-bottom:5px">Cost per meeting booked</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--td);margin-bottom:5px" data-i18n="cpmLabel">Cost per meeting booked</div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--pu)" id="s3Cpm">—</div>
       </div>
-      <div style="font-size:11px;color:var(--td);text-align:right;line-height:1.6">total monthly spend<br/>÷ meetings from all channels</div>
+      <div style="font-size:11px;color:var(--td);text-align:right;line-height:1.6" data-i18n="cpmSub">total monthly spend ÷ meetings from all channels</div>
     </div>
   </div>
 
@@ -795,9 +799,9 @@ footer a:hover{color:var(--pu)}
       <div class="plan-face pf-front" id="pfFront" onclick="flipPlan()">
         <div class="mw-overlay" id="mwOverlay"></div>
         <div class="monthly-warning" id="monthlyWarn">
-          <div class="mw-title">⚠️ Heads up!</div>
+          <div class="mw-title" data-i18n="mwTitle">⚠️ Heads up!</div>
           <div class="mw-body" id="mwBody">Monthly billing can make it harder to see real results…</div>
-          <span class="mw-dismiss" onclick="dismissWarn(event)">Got it, keep monthly</span>
+          <span class="mw-dismiss" onclick="dismissWarn(event)" data-i18n="mwDismiss">Got it, keep monthly</span>
         </div>
 
         <div class="pf-top">
@@ -808,9 +812,9 @@ footer a:hover{color:var(--pu)}
           </div>
         </div>
         <div class="bil-tog">
-          <button class="btog" data-b="monthly" onclick="setBil('monthly',event)">Monthly</button>
-          <button class="btog" data-b="quarterly" onclick="setBil('quarterly',event)">3-Month<span class="stag">−5%</span></button>
-          <button class="btog on" data-b="annual" onclick="setBil('annual',event)">Annual<span class="stag">−25%</span></button>
+          <button class="btog" data-b="monthly" onclick="setBil('monthly',event)" data-i18n="bilMonthly">Monthly</button>
+          <button class="btog" data-b="quarterly" onclick="setBil('quarterly',event)"><span data-i18n="bil3mo">3-Month</span><span class="stag">−5%</span></button>
+          <button class="btog on" data-b="annual" onclick="setBil('annual',event)"><span data-i18n="bilAnnual">Annual</span><span class="stag">−25%</span></button>
         </div>
         <div class="price-row">
           <div class="price-pfx">$</div>
@@ -819,7 +823,7 @@ footer a:hover{color:var(--pu)}
         </div>
         <div class="price-note" id="pfNote">Billed annually · save 25% vs monthly</div>
         <div class="chip-row" id="pfChips"></div>
-        <div class="flip-hint">
+        <div class="flip-hint" data-i18n="flipHint2">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
           Tap to compare all billing cycles &amp; plans
         </div>
@@ -848,15 +852,15 @@ footer a:hover{color:var(--pu)}
 
   <!-- TOTAL COST BREAKDOWN -->
   <div class="cost-breakdown" id="costBreakdown">
-    <div class="cb-title">What you'll pay / month</div>
+    <div class="cb-title" data-i18n="cbTitle">What you'll pay / month</div>
     <div class="cb-rows" id="cbRows"><!-- filled by JS --></div>
     <div class="cb-total-row">
-      <div class="cb-total-label">Total</div>
+      <div class="cb-total-label" data-i18n="cbTotal">Total</div>
       <div class="cb-total-val" id="cbTotal">—</div>
     </div>
     <!-- LI slot adjuster -->
     <div class="li-adj-row" id="liAdjRow" style="display:none">
-      <div class="li-adj-label">LinkedIn slots included</div>
+      <div class="li-adj-label" data-i18n="liAdjLabel">LinkedIn slots included</div>
       <div class="slot-stepper">
         <button class="slot-btn" onclick="adjustLiSlots(-1)">−</button>
         <div class="slot-count" id="s3LiSlots">1</div>
@@ -868,7 +872,7 @@ footer a:hover{color:var(--pu)}
     <div id="cbDiscountNote" style="display:none"></div>
   </div>
 
-  <div style="text-align:center;margin-top:18px"><button class="btn-ghost" onclick="goStep(2)">← Back to revenue</button></div>
+  <div style="text-align:center;margin-top:18px"><button class="btn-ghost" onclick="goStep(2)" data-i18n="backBtn">← Back to revenue</button></div>
 </div>
 
 <footer>
@@ -879,13 +883,13 @@ footer a:hover{color:var(--pu)}
 
 <!-- HIDDEN DISCOUNT PANEL — activated via Konami or URL param -->
 <div class="discount-panel" id="discountPanel">
-  <div class="dp-title">🔒 Offer Override</div>
+  <div class="dp-title" data-i18n="dpTitle">🔒 Offer Override</div>
   <div class="dp-row">
-    <label>Plan discount (%)</label>
+    <label data-i18n="dpPlan">Plan discount (%)</label>
     <input class="dp-inp" type="number" id="dpPlanDisc" value="0" min="0" max="80" placeholder="0" oninput="applyDiscount()"/>
   </div>
   <div class="dp-row">
-    <label>LIA discount (%)</label>
+    <label data-i18n="dpLia">LIA discount (%)</label>
     <input class="dp-inp" type="number" id="dpLiaDisc" value="0" min="0" max="80" placeholder="0" oninput="applyDiscount()"/>
   </div>
   <div class="dp-active-badge" id="dpBadge">Discount active</div>
@@ -1045,7 +1049,7 @@ function updateStep2Revenue(){
   if(sub){
     const dealsDisplay=monthlyDealsRaw>=0.01?monthlyDealsRaw.toFixed(1):'<0.1';
     const cycleAdj=frac<1?' · '+Math.round(frac*100)+'% closeable/mo':'';
-    sub.textContent=dealsDisplay+' deals/mo'+cycleAdj+' · $'+fN(dv)+' avg';
+    sub.textContent=dealsDisplay+T('d_deals_mo')+cycleAdj+' · $'+fN(dv)+T('d_avg');
   }
 }
 function updateCycleNote2(){
@@ -1217,7 +1221,7 @@ function calcJourney(){
       const el=document.getElementById(id); if(el) el.classList.toggle('filled',active);
     });
     const liCost=slots*69;
-    document.getElementById('liCostNote').innerHTML=slots+' slot'+(slots>1?'s':'')+' × $69 = <strong>$'+liCost+'/mo</strong> added to plan cost';
+    document.getElementById('liCostNote').innerHTML=slots+T('d_liSlotCost')+liCost+'</strong>'+T('d_perMoAdded');
   }
 }
 
@@ -1363,7 +1367,7 @@ function goReveal(){
     document.getElementById('ffr4').textContent=document.getElementById('rClose').value+'% win rate';
     if(advRoiUnlocked) updateAdvRoi();
     // update mailbox block on page 2
-    document.getElementById('mbDesc').textContent=`${Math.round(r.leads).toLocaleString()} leads × ${r.seq} emails ÷ (22 days × ${r.lim}/mailbox/day):`;
+    document.getElementById('mbDesc').textContent=Math.round(r.leads).toLocaleString()+T('d_mailboxFormula')+r.seq+T('d_mailboxFormula2')+r.lim+T('d_mailboxFormula3');
     document.getElementById('mbCount').textContent=r.mbNeeded;
   },80);
 }
@@ -1405,11 +1409,11 @@ function showMonthlyWarn(){
   if(cycle>=30){
     msg="Heads up: your "+cycle+"-day sales cycle means this month's meetings close after billing resets. You pay for the outreach this month; revenue lands next period.";
   } else if(cycle>=21){
-    msg="With a "+cycle+"-day cycle, some deals spill into next month. A 3-month plan lets you see the full return without renewal pressure.";
+    msg=T('d_warnCycle21')+cycle+T('d_warnCycle21b');
   } else if(cycle>=14){
-    msg="Even at "+cycle+" days, last-week meetings close right as the next invoice lands. Quarterly smooths that out.";
+    msg=T('d_warnCycle14')+cycle+T('d_warnCycle14b');
   } else {
-    msg="Your "+cycle+"-day cycle is short enough for monthly — though quarterly saves 5% for the same commitment.";
+    msg=T('d_warnCycle7')+cycle+T('d_warnCycle7b');
   }
   document.getElementById('mwBody').textContent=msg;
   document.getElementById('monthlyWarn').classList.add('show');
@@ -1529,7 +1533,7 @@ function updateRoiBlock(){
   lotteryScroll(document.getElementById('roiHlNum'), roi, v=>v>=1?v.toFixed(1)+'×':'<1×');
 
   // Show period totals on the bars
-  const pLabel=billing==='annual'?' /yr':billing==='quarterly'?' /qtr':'';
+  const pLabel=billing==='annual'?T('d_perYr'):billing==='quarterly'?T('d_perQtr'):'';
   document.getElementById('rbRevAmt').textContent=fm(totalPeriodRev)+pLabel;
   document.getElementById('rbCostAmt').textContent=fm(totalPeriodCost)+pLabel;
   document.getElementById('rbNetAmt').textContent=fm(net)+pLabel;
@@ -1543,13 +1547,13 @@ function updateRoiBlock(){
   const sub=document.getElementById('roiHlSub');
   if(sub){
     if(periodFrac===0){
-      sub.textContent='0 deals close — cycle ('+cycle+'d) exceeds billing period';
+      sub.textContent=T('d_noDealsClose')+cycle+T('d_exceedsPeriod');
       sub.style.color='var(--re)';
     } else if(periodFrac<1){
-      sub.textContent=Math.round(periodFrac*100)+'% of meetings close in this period';
+      sub.textContent=Math.round(periodFrac*100)+T('d_closeable_pct');
       sub.style.color='var(--am)';
     } else {
-      sub.textContent=liCostS3>0?'incl. $'+liCostS3+'/mo LI':'for every $1 spent';
+      sub.textContent=liCostS3>0?T('d_inclLI')+liCostS3+'/mo LI':T('d_forEvery1');
       sub.style.color='';
     }
   }
@@ -1558,6 +1562,7 @@ function updateRoiBlock(){
   const bkEl=document.getElementById('roiBreakdownContent');
   if(bkEl){
     const planName=PLANS[planIdx].name;
+    const flipBackLbl=T('d_flipBack');
     const liNote=liCostS3>0?' + $'+liCostS3+'/mo LinkedIn':'';
     const cycleNote=periodFrac<1?'<span style="color:rgba(255,170,44,0.9)">Your '+cycle+'-day closing cycle means only '+Math.round(periodFrac*100)+'% of meetings close within the billing period.</span>':'All meetings closeable within period.';
     const periodLabel2=billing==='annual'?'/ yr':billing==='quarterly'?'/ qtr':'/ mo';
@@ -1579,14 +1584,14 @@ function updateRoiBlock(){
     const divider='<tr><td colspan="2" style="padding:3px 0"><div style="border-top:1px solid rgba(255,255,255,0.07)"></div></td></tr>';
     bkEl.innerHTML=
       '<table style="width:100%;border-collapse:collapse">'
-      +trow('Leads',Math.round((R.leads||0)*billingMonths).toLocaleString())
-      +trow('Replies',Math.round((R.replies||0)*billingMonths).toLocaleString())
-      +trow('Meetings',Math.round((R.totalMeets||0)*billingMonths).toLocaleString())
-      +trow('Deals won',periodDeals+cycleTag)
+      +trow(T('d_leads'),Math.round((R.leads||0)*billingMonths).toLocaleString())
+      +trow(T('d_replies'),Math.round((R.replies||0)*billingMonths).toLocaleString())
+      +trow(T('d_meetings'),Math.round((R.totalMeets||0)*billingMonths).toLocaleString())
+      +trow(T('d_dealsC'),periodDeals+cycleTag)
       +divider
-      +trow('Plan cost',fm(totalPeriodCost),'rgba(155,130,238,0.8)')
-      +trow('Revenue',fm(totalPeriodRev),'rgba(155,130,238,0.8)')
-      +trow('Net',fm(net),'rgba(52,211,153,0.9)')
+      +trow(T('rbCost'),fm(totalPeriodCost),'rgba(155,130,238,0.8)')
+      +trow(T('d_revenueP'),fm(totalPeriodRev),'rgba(155,130,238,0.8)')
+      +trow(T('d_net'),fm(net),'rgba(52,211,153,0.9)')
       +'</table>'
       +(liImpact||'');
   }
@@ -1600,8 +1605,8 @@ function updateRoiBlock(){
     if(annualNet>thisNetAnnualised*1.15 && net>0){
       const extra=fm(annualNet-thisNetAnnualised);
       const msgs={
-        monthly:"Switching to annual adds "+extra+" more net value over 12 months — same outreach, lower per-month cost.",
-        quarterly:"Annual would add "+extra+" more net over a year versus renewing quarterly. The discount compounds.",
+        monthly:T('d_switchAnnual')+extra+T('d_netValue'),
+        quarterly:T('d_annual3mo')+extra+T('d_vs3mo'),
       };
       discouragEl.textContent=msgs[billing]||'';
       discouragEl.style.display='block';
@@ -1850,6 +1855,184 @@ function confetti(){
     w.appendChild(el);el.addEventListener('animationend',()=>el.remove());
   }
 }
+
+
+// ── TRANSLATIONS ────────────────────────────────────────────────────────
+const LANG = {
+  en: {
+    step1:'Your pipeline', step2:'Possible revenue', step3:'Plan & ROI',
+    eyebrow:'2-minute calculator',
+    h1a:'How much could', h1b:'Snov.io make you?',
+    herosub:"Tell us roughly what your outreach looks like. We'll handle the math.",
+    leadsQ:'How many leads do you reach out to per month?',
+    leadsMo:'leads/mo',
+    creditsSplit:'Sourcing all leads fresh? ', adjustSplit:'Adjust credits split',
+    newLeadsLabel:'New leads found via Snov.io:',
+    existingContacts:'Rest come from your existing contacts list — no credits used.',
+    funnelTitle:'Your outreach funnel',
+    jLeads:'Leads', jReplies:'Replies', jMeetings:'Meetings', jDeals:'Deals won',
+    seqSummary:'Using a 4-email sequence · 50/mailbox/day', changeBtn:'Change',
+    emailsPerLead:'emails/lead', totalEmails:'Total emails/mo:',
+    maxPerMb:'Max/mailbox/day:',
+    liTitle:'Add LinkedIn Automation', liSub:'LI outreach on the same leads — boosts meeting rate.',
+    liSlots:'LinkedIn slots', liSlotSub:'Each slot = 1 LinkedIn account',
+    liAccept:'Accept rate', liReply:'Reply rate', liMeeting:'Meeting rate',
+    revealBtn:'Show my possible revenue →',
+    s2h2:'Your possible revenue 🚀',
+    s2sub:'Based on your funnel — this is what consistent outreach with Snov.io could generate each month.',
+    bsLabel:'Possible monthly revenue',
+    ffTitle:'Your funnel at a glance',
+    ffLeads:'Leads reached', ffReplies:'Replies', ffMeetings:'Meetings', ffDeals:'Deals won',
+    advTitle:'Advanced ROI inputs',
+    dealVal:'Average deal value', closeCycle:'Sales closing cycle',
+    advNote:'↑ The possible revenue figure above updates live as you adjust these.',
+    mbTitle:"Minimum mailboxes you'll need", mbMin:'mailboxes minimum',
+    mbSpread:'Spread across domains for better deliverability',
+    planBtn:'See my plan & ROI →', adjustBtn:'← Adjust numbers',
+    s3h2:'Your recommended plan 🎯',
+    s3sub:'Matched to your lead volume & team. Flip the card to compare all plans & billing cycles.',
+    recBadge:'✦ Best match for your usage',
+    roiSub:'for every $1 spent', flipHint:'↺ tap for breakdown',
+    whyRoi:'Why this ROI',
+    rbRev:'Possible rev.', rbCost:'Plan cost', rbNet:'Net value',
+    cpmLabel:'Cost per meeting booked',
+    cpmSub:'total monthly spend ÷ meetings from all channels',
+    mwTitle:'⚠️ Heads up!', mwDismiss:'Got it, keep monthly',
+    bilMonthly:'Monthly', bil3mo:'3-Month', bilAnnual:'Annual',
+    flipHint2:'Tap to compare all billing cycles & plans',
+    cbTitle:"What you'll pay / month", cbTotal:'Total',
+    liAdjLabel:'LinkedIn slots included',
+    backBtn:'← Back to revenue',
+    dpTitle:'🔒 Offer Override', dpPlan:'Plan discount (%)', dpLia:'LIA discount (%)', dpClose:'Close panel ↓',
+    // dynamic JS strings
+    d_deals_mo:' deals/mo', d_closeable:' closeable/mo', d_avg:' avg',
+    d_leadsReached:'leads reached', d_alsoOnLI:'also on LI',
+    d_emailPlusList:' + LI', d_meetingsLI:'email + LinkedIn meetings',
+    d_replyRate:'% email reply rate', d_meetRate:'% meeting rate', d_winRate:'% win rate',
+    d_forEvery1:'for every $1 spent', d_inclLI:'incl. $',
+    d_0deals:'0 deals close', d_cycleExceeds:'-day cycle exceeds billing period',
+    d_closeable_pct:'% of meetings close in this period',
+    d_perYr:' /yr', d_perQtr:' /qtr',
+    d_noDealsClose:'0 deals close — cycle (',
+    d_exceedsPeriod:'d) exceeds billing period',
+    d_switchAnnual:'Switching to annual adds ', d_netValue:' more net value over 12 months — same outreach, lower per-month cost.',
+    d_annual3mo:'Annual would add ', d_vs3mo:' more net over a year versus renewing quarterly. The discount compounds.',
+    d_youSaving:"You're saving", d_discApplied:'🎉 Discount applied',
+    d_youPay:'You pay', d_warnCycle0:"Heads up: your ",
+    d_warnCycle0b:"-day sales cycle means this month's meetings close after billing resets. Revenue lands in the next period.",
+    d_warnCycle21:"With a ", d_warnCycle21b:"-day cycle, some deals spill into next month. A 3-month plan lets you see the full return without renewal pressure.",
+    d_warnCycle14:"Even at ", d_warnCycle14b:" days, last-week meetings close right as the next invoice lands. Quarterly smooths that out.",
+    d_warnCycle7:"Your ", d_warnCycle7b:"-day cycle is short enough for monthly — though quarterly saves 5% for the same commitment.",
+    d_liSlotCost:' slot × $69 = $', d_perMoAdded:'/mo added to plan cost',
+    d_liLeadsQ:'How many of your ', d_liLeadsQ2:' leads also get LinkedIn outreach?',
+    d_seqSummaryDyn:'Using a ', d_seqSummaryDyn2:'-email sequence · ', d_seqSummaryDyn3:'/mailbox/day',
+    d_mailboxFormula:' leads × ', d_mailboxFormula2:' emails ÷ (22 days × ', d_mailboxFormula3:'/mailbox/day):',
+    d_whyRoiTitle:'Why this ROI', d_flipBack:'↺ flip back',
+    d_planCost:' plan', d_revenueP:'Revenue this period', d_net:'Net',
+    d_leads:'Leads', d_replies:'Replies', d_meetings:'Meetings', d_dealsC:'Deals closed',
+    d_liExtraMeetings:'LinkedIn adds ~', d_liExtraDeals:' additional deals.',
+  },
+  pt: {
+    step1:'Seu pipeline', step2:'Receita possível', step3:'Plano & ROI',
+    eyebrow:'Calculadora de 2 minutos',
+    h1a:'Quanto pode', h1b:'Snov.io render para você?',
+    herosub:'Nos diga como é seu processo de outreach. Nós fazemos o resto.',
+    leadsQ:'Quantos leads você contata por mês?',
+    leadsMo:'leads/mês',
+    creditsSplit:'Prospectando todos os leads? ', adjustSplit:'Ajustar divisão de créditos',
+    newLeadsLabel:'Novos leads encontrados via Snov.io:',
+    existingContacts:'O restante vem da sua lista de contatos — sem uso de créditos.',
+    funnelTitle:'Seu funil de outreach',
+    jLeads:'Leads', jReplies:'Respostas', jMeetings:'Reuniões', jDeals:'Negócios fechados',
+    seqSummary:'Usando sequência de 4 e-mails · 50/caixa/dia', changeBtn:'Alterar',
+    emailsPerLead:'e-mails/lead', totalEmails:'Total de e-mails/mês:',
+    maxPerMb:'Máx/caixa/dia:',
+    liTitle:'Adicionar Automação LinkedIn', liSub:'Outreach no LinkedIn para os mesmos leads — aumenta a taxa de reuniões.',
+    liSlots:'Slots do LinkedIn', liSlotSub:'Cada slot = 1 conta LinkedIn',
+    liAccept:'Taxa de aceite', liReply:'Taxa de resposta', liMeeting:'Taxa de reunião',
+    revealBtn:'Ver minha receita possível →',
+    s2h2:'Sua receita possível 🚀',
+    s2sub:'Com base no seu funil — é isso que o outreach consistente com o Snov.io pode gerar por mês.',
+    bsLabel:'Receita mensal possível',
+    ffTitle:'Seu funil em um olhar',
+    ffLeads:'Leads contatados', ffReplies:'Respostas', ffMeetings:'Reuniões', ffDeals:'Negócios fechados',
+    advTitle:'Inputs avançados de ROI',
+    dealVal:'Valor médio do negócio', closeCycle:'Ciclo de fechamento de vendas',
+    advNote:'↑ O valor da receita acima se atualiza conforme você ajusta.',
+    mbTitle:'Mínimo de caixas de e-mail necessárias', mbMin:'caixas mínimas',
+    mbSpread:'Distribuídas entre domínios para melhor entregabilidade',
+    planBtn:'Ver meu plano & ROI →', adjustBtn:'← Ajustar números',
+    s3h2:'Seu plano recomendado 🎯',
+    s3sub:'Combinado com o volume de leads e equipe. Vire o cartão para comparar todos os planos e ciclos de cobrança.',
+    recBadge:'✦ Melhor combinação para seu uso',
+    roiSub:'para cada R$1 investido', flipHint:'↺ ver detalhes',
+    whyRoi:'Por que este ROI',
+    rbRev:'Receita possível', rbCost:'Custo do plano', rbNet:'Valor líquido',
+    cpmLabel:'Custo por reunião agendada',
+    cpmSub:'gasto mensal total ÷ reuniões de todos os canais',
+    mwTitle:'⚠️ Atenção!', mwDismiss:'Ok, manter mensal',
+    bilMonthly:'Mensal', bil3mo:'3 Meses', bilAnnual:'Anual',
+    flipHint2:'Toque para comparar todos os ciclos de cobrança e planos',
+    cbTitle:'O que você pagará / mês', cbTotal:'Total',
+    liAdjLabel:'Slots LinkedIn incluídos',
+    backBtn:'← Voltar à receita',
+    dpTitle:'🔒 Substituição de Oferta', dpPlan:'Desconto no plano (%)', dpLia:'Desconto LIA (%)', dpClose:'Fechar painel ↓',
+    // dynamic
+    d_deals_mo:' negócios/mês', d_closeable:' fecháveis/mês', d_avg:' médio',
+    d_leadsReached:'leads contatados', d_alsoOnLI:'também no LI',
+    d_emailPlusList:' + LI', d_meetingsLI:'reuniões por e-mail + LinkedIn',
+    d_replyRate:'% taxa de resposta por e-mail', d_meetRate:'% taxa de reunião', d_winRate:'% taxa de fechamento',
+    d_forEvery1:'para cada $1 investido', d_inclLI:'incl. $',
+    d_0deals:'0 negócios fecham', d_cycleExceeds:'-d ciclo excede o período de cobrança',
+    d_closeable_pct:'% das reuniões fecham neste período',
+    d_perYr:' /ano', d_perQtr:' /trim',
+    d_noDealsClose:'0 negócios fecham — ciclo (',
+    d_exceedsPeriod:'d) excede o período de cobrança',
+    d_switchAnnual:'Mudar para anual adiciona ', d_netValue:' mais em valor líquido em 12 meses — mesmo outreach, menor custo mensal.',
+    d_annual3mo:'O plano anual adicionaria ', d_vs3mo:' a mais em um ano versus renovar trimestralmente. O desconto compensa.',
+    d_youSaving:'Você está economizando', d_discApplied:'🎉 Desconto aplicado',
+    d_youPay:'Você paga', d_warnCycle0:"Atenção: seu ciclo de ",
+    d_warnCycle0b:" dias significa que as reuniões deste mês fecham após a renovação da cobrança. A receita cai no próximo período.",
+    d_warnCycle21:"Com um ciclo de ", d_warnCycle21b:" dias, alguns negócios passam para o mês seguinte. Um plano de 3 meses permite ver o retorno completo sem pressão de renovação.",
+    d_warnCycle14:"Mesmo com ", d_warnCycle14b:" dias, reuniões da última semana fecham bem quando a próxima fatura chega. O trimestral suaviza isso.",
+    d_warnCycle7:"Seu ciclo de ", d_warnCycle7b:" dias é curto o suficiente para mensal — embora o trimestral economize 5% pelo mesmo compromisso.",
+    d_liSlotCost:' slot × $69 = $', d_perMoAdded:'/mês adicionado ao custo do plano',
+    d_liLeadsQ:'Quantos dos seus ', d_liLeadsQ2:' leads também recebem outreach no LinkedIn?',
+    d_seqSummaryDyn:'Usando sequência de ', d_seqSummaryDyn2:' e-mails · ', d_seqSummaryDyn3:'/caixa/dia',
+    d_mailboxFormula:' leads × ', d_mailboxFormula2:' e-mails ÷ (22 dias × ', d_mailboxFormula3:'/caixa/dia):',
+    d_whyRoiTitle:'Por que este ROI', d_flipBack:'↺ voltar',
+    d_planCost:' plano', d_revenueP:'Receita neste período', d_net:'Líquido',
+    d_leads:'Leads', d_replies:'Respostas', d_meetings:'Reuniões', d_dealsC:'Negócios fechados',
+    d_liExtraMeetings:'LinkedIn adiciona ~', d_liExtraDeals:' negócios adicionais.',
+  }
+};
+
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = LANG[lang];
+  // Update all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) el.textContent = t[key];
+  });
+  // Update toggle button styles
+  document.getElementById('langEN').style.background = lang==='en' ? 'var(--s1)' : 'transparent';
+  document.getElementById('langEN').style.color = lang==='en' ? 'var(--pu)' : 'var(--td)';
+  document.getElementById('langEN').style.boxShadow = lang==='en' ? '0 1px 3px rgba(91,52,217,0.12)' : 'none';
+  document.getElementById('langPT').style.background = lang==='pt' ? 'var(--s1)' : 'transparent';
+  document.getElementById('langPT').style.color = lang==='pt' ? 'var(--pu)' : 'var(--td)';
+  document.getElementById('langPT').style.boxShadow = lang==='pt' ? '0 1px 3px rgba(91,52,217,0.12)' : 'none';
+  // Re-render dynamic elements that depend on language
+  updateSeqSummary();
+  if (R.leads) {
+    updateStep2Revenue();
+    if (document.getElementById('step3').classList.contains('active')) updateRoiBlock();
+  }
+}
+
+function T(key) { return (LANG[currentLang] && LANG[currentLang][key]) || LANG.en[key] || key; }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
 document.querySelectorAll('input[type=range]').forEach(r=>updateTrack(r));
