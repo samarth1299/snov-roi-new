@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Snov.io — ROI Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pu:#5B34D9;
+  --pu-l:#7150E8;
+  --pu-ll:#9B82EE;
+  --pu-d:#3F22B0;
+  --pu-bg:rgba(91,52,217,0.07);
+  --pu-bg2:rgba(91,52,217,0.04);
+  --pu-border:rgba(91,52,217,0.18);
+  --bg:#F4F2FC;
+  --s1:#FFFFFF;
+  --s2:#F8F7FD;
+  --s3:#EDE9F8;
+  --b0:rgba(91,52,217,0.07);
+  --b1:rgba(91,52,217,0.11);
+  --b2:rgba(91,52,217,0.17);
+  --tx:#130E36;
+  --tm:#5F5880;
+  --td:#A89EC8;
+  --gr:#0E9E5A;
+  --gr-bg:rgba(14,158,90,0.07);
+  --gr-border:rgba(14,158,90,0.20);
+  --am:#C96B00;
+  --am-bg:rgba(201,107,0,0.07);
+  --re:#CC1F1F;
+  --re-bg:rgba(204,31,31,0.05);
+  --re-border:rgba(204,31,31,0.22);
+  --r:16px;
+  --rs:10px;
+  --sh:0 1px 3px rgba(91,52,217,0.06),0 4px 16px rgba(91,52,217,0.07);
+  --sh-lg:0 2px 6px rgba(91,52,217,0.07),0 12px 32px rgba(91,52,217,0.11);
+  --sh-pu:0 4px 20px rgba(91,52,217,0.22);
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{background:var(--bg);color:var(--tx);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* subtle diagonal mesh bg */
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle at 60% 0%,rgba(91,52,217,0.06) 0%,transparent 55%),radial-gradient(circle at 10% 90%,rgba(14,158,90,0.04) 0%,transparent 45%);pointer-events:none;z-index:0}
+
+.shell{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:44px 20px 100px}
+
+/* ── LOGO ── */
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:40px}
+.logo-mark{width:36px;height:36px;background:linear-gradient(145deg,var(--pu-l),var(--pu-d));border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(91,52,217,0.3),inset 0 1px 0 rgba(255,255,255,0.15)}
+.logo-mark svg{width:18px;height:18px;fill:#fff}
+.logo-name{font-size:17px;font-weight:800;color:var(--tx);letter-spacing:-.02em}
+.logo-name span{color:var(--pu-l)}
+.logo-sep{width:1px;height:18px;background:var(--b1);margin:0 6px}
+.logo-tag{font-size:10px;font-weight:700;color:var(--td);letter-spacing:.07em;text-transform:uppercase}
+
+/* ── PROGRESS ── */
+.prog-outer{margin-bottom:44px}
+.prog-steps{display:flex;align-items:center;margin-bottom:14px}
+.pstep{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--td);transition:color .3s;white-space:nowrap}
+.pstep.done{color:var(--gr)}
+.pstep.active{color:var(--tx)}
+.pnum{width:24px;height:24px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;transition:all .3s}
+.pstep.done .pnum{background:var(--gr);border-color:var(--gr);color:#fff;box-shadow:0 0 0 3px rgba(14,158,90,0.15)}
+.pstep.active .pnum{border-color:var(--pu);color:var(--pu);box-shadow:0 0 0 3px var(--pu-bg)}
+.pline{flex:1;height:2px;margin:0 10px;background:var(--s3);border-radius:1px;overflow:hidden;position:relative;min-width:20px}
+.pline::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,var(--pu),var(--gr));transform:scaleX(0);transform-origin:left;transition:transform .5s .1s cubic-bezier(.4,0,.2,1);border-radius:1px}
+.pline.done::after{transform:scaleX(1)}
+.prog-track{height:3px;background:var(--s3);border-radius:2px;overflow:hidden}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--pu),var(--pu-l) 60%,var(--gr));border-radius:2px;transition:width .65s cubic-bezier(.4,0,.2,1)}
+
+/* ── SCREENS ── */
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HERO ── */
+.hero{margin-bottom:40px}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pu);background:var(--pu-bg);border:1px solid var(--pu-border);border-radius:100px;padding:5px 13px;margin-bottom:18px}
+.edot{width:5px;height:5px;background:var(--pu);border-radius:50%;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.5)}}
+h1{font-size:clamp(28px,5.5vw,46px);font-weight:800;line-height:1.07;letter-spacing:-.03em;margin-bottom:12px;color:var(--tx)}
+h1 em{font-style:normal;background:linear-gradient(130deg,var(--pu) 0%,var(--pu-l) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:15px;color:var(--tm);line-height:1.7;max-width:440px}
+
+/* ── CARDS ── */
+.card{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);padding:22px;box-shadow:var(--sh);transition:border-color .2s,box-shadow .2s}
+.card:focus-within{border-color:var(--pu-border);box-shadow:0 0 0 3px var(--pu-bg),var(--sh)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}
+.card-label{font-size:14px;font-weight:700;color:var(--tx);line-height:1.35}
+.card-tag{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--td);background:var(--s2);border:1px solid var(--b0);border-radius:6px;padding:3px 8px;flex-shrink:0;white-space:nowrap}
+.card-hint{font-size:12px;color:var(--tm);margin-bottom:12px;line-height:1.6}
+
+/* section spacing */
+.section-gap{margin-top:28px}
+
+/* big num */
+.bnum-row{display:flex;align-items:baseline;gap:4px}
+.bnum-pfx{font-size:26px;font-weight:700;color:var(--td)}
+.bnum-inp{font-family:'Plus Jakarta Sans',sans-serif;font-size:42px;font-weight:800;color:var(--tx);background:transparent;border:none;outline:none;width:100%;-moz-appearance:textfield;letter-spacing:-.03em;line-height:1}
+.bnum-inp::-webkit-inner-spin-button,.bnum-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+
+/* slider */
+.sl-wrap{margin-top:12px}
+.sl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.sl-hint{font-size:11px;color:var(--td);font-weight:500}
+.sl-val{font-size:20px;font-weight:800;color:var(--pu);font-family:'Plus Jakarta Sans',sans-serif}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;outline:none;cursor:pointer;background:var(--s3)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--s1);border-radius:50%;border:2px solid var(--pu);box-shadow:0 1px 4px rgba(91,52,217,.2);cursor:pointer;transition:transform .12s,box-shadow .12s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.25);box-shadow:0 2px 10px rgba(91,52,217,.35)}
+
+/* 2-col grid */
+.q-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:520px){.q-grid{grid-template-columns:1fr}}
+
+/* mailbox note */
+.mb-inline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--s2);border:1px solid var(--b0);border-radius:10px;padding:10px 14px;margin-top:12px}
+.mb-inline-txt{font-size:12px;color:var(--tm);flex:1;min-width:120px}
+.mb-inline-txt strong{color:var(--tx);font-family:'JetBrains Mono',monospace}
+.mb-inline-edit{display:flex;align-items:center;gap:6px}
+.mb-inline-edit label{font-size:11px;font-weight:600;color:var(--td)}
+.iinp{font-size:14px;font-weight:700;color:var(--tx);background:var(--s1);border:1.5px solid var(--b1);border-radius:8px;padding:5px 9px;width:68px;outline:none;-moz-appearance:textfield;font-family:'Plus Jakarta Sans',sans-serif;transition:border-color .2s;box-shadow:0 1px 3px rgba(91,52,217,0.05)}
+.iinp:focus{border-color:var(--pu-border)}
+.iinp::-webkit-inner-spin-button,.iinp::-webkit-outer-spin-button{-webkit-appearance:none}
+
+/* ═══ JOURNEY ═══ */
+.journey{display:flex;flex-direction:column;gap:0;margin:24px 0 4px}
+.j-step{display:flex;align-items:stretch;gap:0}
+.j-left{display:flex;flex-direction:column;align-items:center;width:42px;flex-shrink:0}
+.j-circle{width:34px;height:34px;border-radius:50%;border:2px solid var(--pu-border);background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;z-index:1;box-shadow:var(--sh);transition:all .25s}
+.j-circle.filled{background:var(--pu);border-color:var(--pu);color:#fff;box-shadow:0 2px 8px rgba(91,52,217,0.3)}
+.j-line{width:2px;flex:1;background:linear-gradient(to bottom,var(--pu-border) 0%,transparent 100%);margin:4px auto 0}
+.j-step:last-child .j-line{display:none}
+.j-content{flex:1;padding:2px 0 24px 16px}
+.j-title{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:5px;line-height:1.3}
+.j-sub{font-size:11px;color:var(--tm);line-height:1.5;margin-top:4px}
+.j-val{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;color:var(--pu);margin-top:5px;letter-spacing:-.01em}
+
+/* ── BUTTONS ── */
+.btn-main{width:100%;padding:15px;background:var(--pu);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-.01em;border:none;border-radius:var(--r);cursor:pointer;transition:transform .13s,box-shadow .17s,background .15s;margin-top:8px;box-shadow:0 2px 8px rgba(91,52,217,0.25),0 8px 24px rgba(91,52,217,0.18);position:relative;overflow:hidden}
+.btn-main::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,255,255,0.08),transparent);pointer-events:none}
+.btn-main:hover{background:var(--pu-l);transform:translateY(-2px);box-shadow:0 4px 12px rgba(91,52,217,0.3),0 12px 32px rgba(91,52,217,0.22)}
+.btn-main:active{transform:translateY(0);box-shadow:0 2px 8px rgba(91,52,217,0.2)}
+.btn-ghost{background:transparent;border:1.5px solid var(--b1);color:var(--tm);font-size:13px;font-weight:600;padding:9px 18px;border-radius:10px;cursor:pointer;transition:all .17s;font-family:'Plus Jakarta Sans',sans-serif}
+.btn-ghost:hover{border-color:var(--pu-border);color:var(--pu);background:var(--pu-bg)}
+
+/* ═══ STEP 2 ═══ */
+.rev-head{text-align:center;margin-bottom:32px}
+.rev-head h2{font-size:clamp(22px,4.5vw,34px);font-weight:800;letter-spacing:-.025em;margin-bottom:8px}
+.rev-head p{font-size:14px;color:var(--tm);line-height:1.65}
+
+/* Big stat — keep dark for drama */
+.big-stat{background:linear-gradient(150deg,#1A0E42 0%,#2D1B6B 100%);border-radius:20px;padding:40px 28px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(91,52,217,0.22)}
+.big-stat::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -10%,rgba(155,130,238,0.18),transparent 60%);pointer-events:none}
+.big-stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(155,130,238,0.3),transparent)}
+.bs-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:14px}
+.bs-num{font-size:clamp(52px,11vw,86px);font-weight:800;letter-spacing:-.04em;line-height:1;color:#fff}
+.bs-num .bs-dollar{color:var(--pu-ll)}
+.bs-sub{font-size:13px;color:rgba(255,255,255,0.4);margin-top:10px}
+
+/* Funnel flow */
+.funnel-flow{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);padding:22px;margin-bottom:14px;box-shadow:var(--sh)}
+.ff-title{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--td);margin-bottom:18px}
+.ff-steps{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:2px}
+.ff-step{flex:1;min-width:72px;display:flex;flex-direction:column;align-items:center}
+.ff-box{background:var(--s2);border:1px solid var(--b0);border-radius:12px;padding:13px 8px;text-align:center;width:100%;transition:border-color .2s,background .2s}
+.ff-box.active{border-color:var(--pu-border);background:var(--pu-bg)}
+.ff-box-num{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:600;color:var(--pu);line-height:1;margin-bottom:5px}
+.ff-box-lbl{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--td);line-height:1.3}
+.ff-box-rate{font-size:10px;color:var(--am);margin-top:3px;font-weight:600}
+.ff-arrow{display:flex;align-items:center;justify-content:center;color:var(--td);font-size:16px;width:24px;flex-shrink:0;padding-top:14px;opacity:.5}
+
+/* ═══ STEP 3 ═══ */
+.plan-head{text-align:center;margin-bottom:24px}
+.plan-head h2{font-size:clamp(22px,4.5vw,34px);font-weight:800;letter-spacing:-.025em;margin-bottom:8px}
+.plan-head p{font-size:14px;color:var(--tm);line-height:1.65}
+.rec-badge{display:inline-flex;align-items:center;gap:6px;background:var(--pu-bg);border:1px solid var(--pu-border);border-radius:100px;padding:5px 14px;font-size:11px;font-weight:700;color:var(--pu);margin-bottom:20px;letter-spacing:.02em}
+
+/* ROI HERO — keep dark */
+.roi-hero{background:linear-gradient(150deg,#1A0E42 0%,#2D1B6B 100%);border-radius:18px;padding:26px;margin-bottom:14px;box-shadow:0 8px 40px rgba(91,52,217,0.22);display:flex;gap:24px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden}
+.roi-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(155,130,238,0.12),transparent 70%);pointer-events:none}
+.roi-hero-left{text-align:center;min-width:110px}
+.roi-hero-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:8px}
+.roi-hero-num{font-family:'JetBrains Mono',monospace;font-size:52px;font-weight:600;color:#C4B0FF;line-height:1;letter-spacing:-.02em}
+.roi-hero-sub{font-size:11px;color:rgba(255,255,255,0.3);margin-top:5px}
+.roi-hero-right{flex:1;min-width:160px}
+.rb-rows{display:flex;flex-direction:column;gap:10px}
+.rb-row{display:flex;align-items:center;gap:10px}
+.rb-lbl{font-size:11px;font-weight:600;color:rgba(255,255,255,0.45);width:88px;flex-shrink:0}
+.rb-track{flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+.rb-fill{height:100%;border-radius:2px;transition:width .85s .4s cubic-bezier(.4,0,.2,1)}
+.rb-fill.pu{background:#9B82EE}.rb-fill.gr{background:#34D399}.rb-fill.td{background:rgba(255,255,255,0.2)}
+.rb-amt{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:#fff;width:56px;text-align:right;flex-shrink:0}
+
+/* FLIP PLAN CARD */
+.plan-scene{width:100%;perspective:1400px;margin-bottom:14px}
+.plan-card{position:relative;width:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.35,0,.2,1)}
+.plan-card.flipped{transform:rotateY(180deg)}
+.plan-face{backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px;overflow:hidden}
+.plan-back-face{position:absolute;inset:0;transform:rotateY(180deg);border-radius:18px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+
+/* FRONT */
+.pf-front{background:var(--s1);border:1.5px solid var(--pu-border);padding:28px;cursor:pointer;position:relative;overflow:hidden;box-shadow:var(--sh-lg)}
+.pf-front::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pu),var(--pu-l));border-radius:18px 18px 0 0}
+.pf-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:20px}
+.pf-name{font-size:34px;font-weight:800;letter-spacing:-.025em;color:var(--tx)}
+.pf-badges{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.badge-rec{background:var(--pu);color:#fff;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-radius:100px;padding:4px 11px;box-shadow:0 2px 6px rgba(91,52,217,0.25)}
+.badge-ob{display:flex;align-items:center;gap:5px;background:var(--gr-bg);border:1px solid var(--gr-border);color:var(--gr);font-size:10px;font-weight:700;border-radius:100px;padding:4px 11px}
+
+/* BILLING TOGGLE */
+.bil-tog{display:inline-flex;background:var(--s2);border:1px solid var(--b1);border-radius:100px;padding:3px;gap:2px;margin-bottom:22px}
+.btog{font-size:12px;font-weight:600;padding:7px 15px;border-radius:100px;border:none;background:transparent;color:var(--tm);cursor:pointer;transition:all .2s;white-space:nowrap;position:relative;font-family:'Plus Jakarta Sans',sans-serif}
+.btog.on{background:var(--s1);color:var(--pu);box-shadow:0 1px 4px rgba(91,52,217,0.15);font-weight:700}
+.stag{position:absolute;top:-8px;right:-3px;background:var(--gr);color:#fff;font-size:8px;font-weight:700;border-radius:100px;padding:2px 5px}
+
+/* MONTHLY WARNING */
+.monthly-warning{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--s1);border:2px solid var(--re);border-radius:14px;padding:20px 22px;max-width:320px;width:90%;z-index:20;box-shadow:0 8px 40px rgba(204,31,31,0.18);animation:warnIn .25s ease}
+.monthly-warning.show{display:block}
+@keyframes warnIn{from{opacity:0;transform:translate(-50%,-55%)}to{opacity:1;transform:translate(-50%,-50%)}}
+.mw-title{font-size:14px;font-weight:800;color:var(--re);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.mw-body{font-size:13px;color:var(--tm);line-height:1.6;margin-bottom:14px}
+.mw-dismiss{font-size:12px;font-weight:600;color:var(--td);cursor:pointer;text-decoration:underline}
+.mw-overlay{display:none;position:absolute;inset:0;background:rgba(20,10,50,0.55);border-radius:18px;z-index:15;backdrop-filter:blur(3px)}
+.mw-overlay.show{display:block}
+
+/* price */
+.price-row{display:flex;align-items:baseline;gap:4px;margin-bottom:4px}
+.price-pfx{font-size:22px;font-weight:700;color:var(--td)}
+.price-main{font-size:52px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--tx)}
+.price-main.warn-pulse{animation:warnPulse .5s ease}
+@keyframes warnPulse{0%,100%{color:var(--tx)}50%{color:var(--re)}}
+.price-per{font-size:15px;color:var(--tm)}
+.price-note{font-size:12px;color:var(--td);margin-bottom:20px}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.chip{font-size:11px;font-weight:600;background:var(--s2);border:1px solid var(--b0);border-radius:100px;padding:4px 11px;color:var(--td)}
+.chip.pu{background:var(--pu-bg);border-color:var(--pu-border);color:var(--pu)}
+.chip.gr{background:var(--gr-bg);border-color:var(--gr-border);color:var(--gr)}
+.chip.li{background:rgba(10,102,194,0.07);border-color:rgba(10,102,194,0.18);color:#0a66c2}
+.flip-hint{font-size:11px;color:var(--td);display:flex;align-items:center;gap:5px;margin-top:4px}
+
+/* BACK */
+.pf-back{background:var(--s1);border:1px solid var(--b1);padding:26px;cursor:pointer;min-height:100%;box-shadow:var(--sh-lg)}
+.pb-title{font-size:16px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px;color:var(--tx)}
+.plan-pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:18px}
+.plan-pills span{font-size:10px;font-weight:700;color:var(--td);margin-right:4px;text-transform:uppercase;letter-spacing:.06em}
+.ppill{font-size:11px;font-weight:700;background:var(--s2);border:1px solid var(--b1);border-radius:100px;padding:5px 13px;cursor:pointer;color:var(--tm);transition:all .17s}
+.ppill.on{background:var(--pu-bg);border-color:var(--pu-border);color:var(--pu);box-shadow:0 0 0 2px var(--pu-bg)}
+.bil-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:480px){.bil-cols{grid-template-columns:1fr}}
+.bcol{background:var(--s2);border:1px solid var(--b1);border-radius:var(--rs);padding:18px 14px;text-align:center;position:relative;transition:border-color .2s}
+.bcol.best{background:var(--s1);border-color:var(--pu);box-shadow:0 2px 12px rgba(91,52,217,0.12)}
+.bcol-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--pu);color:#fff;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:100px;padding:2px 10px;white-space:nowrap}
+.bcol-period{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tm);margin-bottom:9px}
+.bcol-price{font-size:26px;font-weight:800;margin-bottom:3px;color:var(--tx)}
+.bcol.best .bcol-price{color:var(--pu)}
+.bcol-note{font-size:10px;color:var(--td);line-height:1.5}
+.bcol-save{display:inline-block;margin-top:7px;font-size:10px;font-weight:700;color:var(--gr);background:var(--gr-bg);border-radius:100px;padding:2px 8px}
+
+/* MAILBOX — bottom of step 3 */
+.mb-block{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh);margin-bottom:14px;display:flex;gap:14px;align-items:flex-start}
+.mb-ico{width:36px;height:36px;background:var(--pu-bg);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 3px rgba(91,52,217,0.1)}
+.mb-ico svg{width:16px;height:16px;stroke:var(--pu);fill:none;stroke-width:2}
+.mb-title{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px}
+.mb-desc{font-size:12px;color:var(--tm);line-height:1.6;margin-bottom:10px}
+.mb-pill{display:inline-flex;align-items:baseline;gap:6px;background:var(--pu);border-radius:9px;padding:7px 16px;color:#fff;box-shadow:0 2px 8px rgba(91,52,217,0.25)}
+.mb-pill-num{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;line-height:1}
+.mb-pill-txt{font-size:12px;font-weight:600;opacity:.8}
+
+/* Step 3 total cost breakdown */
+.cost-breakdown{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:20px 22px;margin-bottom:14px;box-shadow:var(--sh)}
+.cb-title{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--td);margin-bottom:14px}
+.cb-rows{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.cb-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cb-row-label{font-size:13px;color:var(--tm)}
+.cb-row-val{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--tx)}
+.cb-total-row{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--b1);padding-top:12px}
+.cb-total-label{font-size:14px;font-weight:700;color:var(--tx)}
+.cb-total-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--pu)}
+
+/* LI slot adjuster on Step 3 */
+.li-adj-row{display:flex;align-items:center;gap:12px;margin-top:12px;padding-top:12px;border-top:1px solid var(--b0);flex-wrap:wrap}
+.li-adj-label{font-size:13px;font-weight:600;color:var(--tx);flex:1;min-width:120px}
+.slot-stepper{display:flex;align-items:center;background:var(--s2);border:1px solid var(--b1);border-radius:9px;overflow:hidden}
+.slot-btn{width:32px;height:32px;background:transparent;border:none;color:var(--tx);font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .14s}
+.slot-btn:hover{background:var(--pu-bg)}
+.slot-count{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--pu);min-width:28px;text-align:center;padding:0 2px}
+.li-roi-impact{font-size:12px;margin-top:8px;line-height:1.55;display:none}
+.li-roi-impact.show{display:block}
+
+/* plan mismatch warnings */
+.plan-warn{display:none;border-radius:var(--r);font-size:13px;line-height:1.6;border:1.5px solid}
+.plan-warn.show{display:block;padding:14px 18px}
+.plan-warn.grave{background:rgba(204,31,31,0.04);border-color:rgba(204,31,31,0.22);color:#991515}
+.plan-warn.witty{background:rgba(201,107,0,0.05);border-color:rgba(201,107,0,0.2);color:#8a4700}
+.plan-warn-title{font-weight:800;margin-bottom:4px;font-size:14px}
+
+/* LOTTERY SCROLL */
+@keyframes slotUp{0%{transform:translateY(40px);opacity:0}60%{transform:translateY(-4px);opacity:1}100%{transform:translateY(0);opacity:1}}
+.slot-anim{animation:slotUp .36s cubic-bezier(.22,1,.36,1) forwards}
+
+/* CONFETTI */
+.conf-wrap{position:fixed;inset:0;pointer-events:none;z-index:9999}
+.conf{position:absolute;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* editable rate in journey */
+.rate-inp{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:var(--am);background:transparent;border:none;border-bottom:2px solid rgba(201,107,0,0.25);outline:none;width:4ch;text-align:center;-moz-appearance:textfield;padding:0 2px;cursor:text;transition:border-color .18s;line-height:1}
+.rate-inp:focus{border-bottom-color:var(--am)}
+.rate-inp::-webkit-inner-spin-button,.rate-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+
+/* monthly warning outline on card */
+.pf-front.monthly-active{border-color:var(--re)!important;box-shadow:0 0 0 3px rgba(204,31,31,0.1),var(--sh-lg)!important}
+@keyframes redBorder{0%{box-shadow:0 0 0 0 rgba(204,31,31,.4)}50%{box-shadow:0 0 0 6px rgba(204,31,31,.12)}100%{box-shadow:0 0 0 3px rgba(204,31,31,.1)}}
+
+/* mailbox >100 warning */
+.mb-over-warn{display:none;margin-top:10px;padding:9px 13px;background:rgba(204,31,31,0.04);border:1px solid rgba(204,31,31,0.2);border-radius:8px;font-size:12px;color:#991515;line-height:1.55}
+.mb-over-warn.show{display:block}
+.mb-inline.over-limit{border-color:rgba(204,31,31,0.3)!important;background:rgba(204,31,31,0.03)!important;animation:mbPulse .4s ease}
+@keyframes mbPulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 3px rgba(204,31,31,0.1)}}
+
+/* ── LINKEDIN ADDON ── */
+.li-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.li-toggle-label{font-size:14px;font-weight:700;color:var(--tx)}
+.li-toggle-sub{font-size:12px;color:var(--tm);margin-top:2px}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--s3);border-radius:100px;cursor:pointer;transition:background .2s;border:1.5px solid var(--b1)}
+.toggle-track::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.toggle-switch input:checked+.toggle-track{background:var(--pu);border-color:var(--pu)}
+.toggle-switch input:checked+.toggle-track::after{transform:translateX(20px)}
+.li-section{display:none;animation:fadeUp .3s ease}
+.li-section.show{display:block}
+.li-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(10,102,194,0.07);border:1px solid rgba(10,102,194,0.18);border-radius:100px;padding:3px 10px;font-size:10px;font-weight:700;color:#0a66c2;letter-spacing:.04em}
+.li-cost-note{font-size:12px;color:var(--tm);margin-top:10px;padding:8px 12px;background:var(--s2);border-radius:8px;border-left:3px solid rgba(10,102,194,0.25)}
+.j-circle.li{background:rgba(10,102,194,0.07);border-color:rgba(10,102,194,0.25);color:#0a66c2}
+.j-circle.li.filled{background:#0a66c2;border-color:#0a66c2;color:#fff;box-shadow:0 2px 8px rgba(10,102,194,0.25)}
+
+/* hidden discount panel */
+.discount-panel{position:fixed;bottom:20px;right:20px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh-lg);z-index:500;width:270px;display:none;animation:fadeUp .25s ease}
+.discount-panel.show{display:block}
+.dp-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pu);margin-bottom:12px}
+.dp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.dp-row label{font-size:12px;font-weight:600;color:var(--tm)}
+.dp-inp{font-size:14px;font-weight:700;color:var(--tx);background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:4px 9px;width:72px;outline:none;-moz-appearance:textfield;font-family:'Plus Jakarta Sans',sans-serif;transition:border-color .18s;text-align:right}
+.dp-inp:focus{border-color:var(--pu-border)}
+.dp-inp::-webkit-inner-spin-button,.dp-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+.dp-active-badge{display:none;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--gr-bg);border:1px solid var(--gr-border);color:var(--gr);border-radius:100px;padding:2px 8px;margin-top:6px}
+.dp-active-badge.show{display:inline-block}
+.dp-close{font-size:11px;color:var(--td);cursor:pointer;text-align:right;margin-top:8px}
+.dp-close:hover{color:var(--pu)}
+.discount-badge{display:none;font-size:10px;font-weight:700;background:var(--gr);color:#fff;border-radius:100px;padding:2px 8px;margin-left:8px;vertical-align:middle}
+.discount-badge.show{display:inline-block}
+
+/* AI insight (kept in CSS for back-compat even if removed from HTML) */
+.ai-insight-wrap{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:18px 20px;margin-bottom:12px;position:relative;overflow:hidden}
+.ai-insight-wrap::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--pu),var(--pu-l))}
+.ai-insight-label{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--pu);margin-bottom:8px;padding-left:2px}
+.ai-insight-text{font-size:13px;color:var(--tm);line-height:1.7;padding-left:2px;min-height:40px}
+.ai-insight-text.loading::after{content:'';display:inline-block;width:3px;height:13px;background:var(--pu);margin-left:4px;animation:cursor-blink .8s step-end infinite;vertical-align:middle}
+@keyframes cursor-blink{0%,100%{opacity:1}50%{opacity:0}}
+
+
+
+/* roi flip card */
+#roiFlipCard > div:first-child { min-height: 140px; }
+#roiFlipCard > div:last-child { min-height: 140px; }
+
+
+/* Horizontal funnel journey */
+.journey-h{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:4px;margin:16px 0 4px}
+.jh-step{flex:1;min-width:120px;display:flex;flex-direction:column;align-items:center;position:relative}
+.jh-step:not(:last-child)::after{content:'→';position:absolute;right:-12px;top:28px;font-size:16px;color:var(--td);z-index:1}
+.jh-node{width:44px;height:44px;border-radius:50%;border:2px solid var(--pu-border);background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:8px;box-shadow:var(--sh);transition:all .25s;flex-shrink:0}
+.jh-node.filled{background:var(--pu);border-color:var(--pu);color:#fff;box-shadow:0 2px 8px rgba(91,52,217,0.3)}
+.jh-body{text-align:center;width:100%;padding:0 4px}
+.jh-title{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--td);margin-bottom:4px}
+.jh-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--pu);line-height:1;margin-bottom:6px}
+.jh-rate{width:100%;margin-top:2px}
+.jh-rate input[type=range]{width:100%;height:3px}
+.jh-inp-row{display:flex;align-items:center;justify-content:center;gap:2px;font-size:12px;color:var(--tm);margin-bottom:3px}
+@media(max-width:520px){.journey-h{flex-wrap:wrap;gap:12px}.jh-step{min-width:calc(50% - 12px)}.jh-step:not(:last-child)::after{display:none}}
+
+/* advanced ROI teaser */
+.adv-roi-wrap{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:14px;overflow:hidden;box-shadow:var(--sh)}
+.adv-roi-locked{cursor:pointer;padding:18px 20px;display:flex;align-items:center;gap:16px;transition:background .18s}
+.adv-roi-locked:hover{background:var(--s2)}
+.adv-roi-blur{flex:1;pointer-events:none;user-select:none}
+.adv-roi-nudge{flex:1;min-width:160px}
+.adv-roi-open{padding:18px 20px;border-top:1px solid var(--b1);animation:fadeUp .3s ease}
+
+footer{text-align:center;font-size:11px;color:var(--td);margin-top:48px;border-top:1px solid var(--b1);padding-top:20px;line-height:1.8}
+footer a{color:var(--tm);text-decoration:none}
+footer a:hover{color:var(--pu)}
+
+/* team pill */
+.tpill{font-size:12px;font-weight:700;background:var(--s2);border:1px solid var(--b1);border-radius:100px;padding:7px 16px;cursor:pointer;color:var(--tm);transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif}
+.tpill.on{background:var(--pu-bg);border-color:var(--pu-border);color:var(--pu);box-shadow:0 0 0 3px var(--pu-bg)}
+</style>
+</head>
+<body>
+<div id="confWrap" class="conf-wrap"></div>
+<div class="shell">
+
+<!-- LOGO -->
+<div class="logo-row">
+  <div class="logo-mark">
+    <svg viewBox="0 0 20 20"><circle cx="10" cy="7" r="3"/><path d="M4 17c0-3.31 2.69-6 6-6s6 2.69 6 6"/></svg>
+  </div>
+  <div class="logo-name">snov<span>.</span>io</div>
+  <div class="logo-sep"></div>
+  <div class="logo-tag">ROI Calculator</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog-outer">
+  <div class="prog-steps">
+    <div class="pstep active" id="ps1"><div class="pnum">1</div><span>Your pipeline</span></div>
+    <div class="pline" id="pl1"></div>
+    <div class="pstep" id="ps2"><div class="pnum">2</div><span>Possible revenue</span></div>
+    <div class="pline" id="pl2"></div>
+    <div class="pstep" id="ps3"><div class="pnum">3</div><span>Plan &amp; ROI</span></div>
+  </div>
+  <div class="prog-track"><div class="prog-bar" id="progBar" style="width:33%"></div></div>
+</div>
+
+<!-- ══════════════ STEP 1 ══════════════ -->
+<div class="screen active" id="step1">
+  <div class="hero">
+    <div class="eyebrow"><div class="edot"></div>2-minute calculator</div>
+    <h1>How much could<br/><em>Snov.io make you?</em></h1>
+    <p class="hero-sub">Tell us roughly what your outreach looks like. We'll handle the math.</p>
+  </div>
+
+  <!-- Leads -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-top" style="margin-bottom:4px">
+      <div class="card-label">How many leads do you reach out to per month?</div>
+      <div class="sl-val" id="lblLeads">300</div>
+    </div>
+    <input type="range" id="rLeads" min="10" max="50000" step="100" value="300" oninput="rSync('rLeads','iLeads','lblLeads',fN);updateTrack(this);syncNewLeads();calcJourney()"/>
+    <div style="margin-top:6px">
+      <input type="number" id="iLeads" value="300" min="1" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;background:transparent;border:none;outline:none;color:var(--tx);width:140px;-moz-appearance:textfield" oninput="sSync('iLeads','rLeads','lblLeads',fN)"/>
+      <span style="font-size:13px;color:var(--td)">leads/mo</span>
+    </div>
+    <!-- new leads vs existing — collapsed disclosure -->
+    <div style="margin-top:10px">
+      <div style="font-size:11px;color:var(--td);cursor:pointer;display:inline-flex;align-items:center;gap:4px;user-select:none" onclick="toggleNewLeadsSplit()" id="newLeadsToggle">
+        <span id="newLeadsSplitArrow">▸</span> Sourcing all leads fresh? <span style="color:var(--pu);font-weight:600">Adjust credits split</span>
+      </div>
+      <div id="newLeadsSplitPanel" style="display:none;margin-top:8px;padding:10px 12px;background:var(--s2);border-radius:9px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="font-size:12px;color:var(--tm)">New leads found via Snov.io:</div>
+          <input class="iinp" type="number" id="iNewLeads" value="300" min="0" style="width:80px;font-size:14px" oninput="syncNewLeads()"/>
+          <div style="font-size:12px;color:var(--td)" id="newLeadsNote">300 credits/mo</div>
+        </div>
+        <div style="font-size:11px;color:var(--td);margin-top:5px">Rest come from your existing contacts list — no credits used.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOURNEY — compact, sliders embedded -->
+  <div class="card" style="margin-bottom:12px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--td);margin-bottom:16px">Your outreach funnel</div>
+    <div class="journey-h" id="journey">
+      <div class="jh-step">
+        <div class="jh-node filled">✉</div>
+        <div class="jh-body">
+          <div class="jh-title">Leads</div>
+          <div class="jh-val" id="jv1">300</div>
+        </div>
+      </div>
+      <div class="jh-step">
+        <div class="jh-node" id="jc2">↩</div>
+        <div class="jh-body">
+          <div class="jh-title">Replies</div>
+          <div class="jh-val" id="jv2">3</div>
+          <div class="jh-inp-row"><input type="number" class="rate-inp" id="jrate2" value="1" min="0.1" max="50" step="0.1" oninput="syncRateInp('jrate2','rReply')"/>%</div>
+          <div class="jh-rate"><input type="range" id="rReply" min="0.1" max="50" step="0.1" value="1" oninput="syncRateSlider('rReply','jrate2');updateTrack(this);calcJourney()"/></div>
+        </div>
+      </div>
+      <div class="jh-step">
+        <div class="jh-node" id="jc3">📅</div>
+        <div class="jh-body">
+          <div class="jh-title">Meetings</div>
+          <div class="jh-val" id="jv3">0</div>
+          <div class="jh-inp-row"><input type="number" class="rate-inp" id="jrate3" value="30" min="0.1" max="80" step="0.1" oninput="syncRateInp('jrate3','rMeet')"/>%</div>
+          <div class="jh-rate"><input type="range" id="rMeet" min="0.1" max="80" step="0.1" value="30" oninput="syncRateSlider('rMeet','jrate3');updateTrack(this);syncLiMeet();calcJourney()"/></div>
+        </div>
+      </div>
+      <div class="jh-step">
+        <div class="jh-node" id="jc4">🏆</div>
+        <div class="jh-body">
+          <div class="jh-title">Deals won</div>
+          <div class="jh-val" id="jv4">0</div>
+          <div class="jh-inp-row"><input type="number" class="rate-inp" id="jrate4" value="20" min="0.1" max="80" step="0.1" oninput="syncRateInp('jrate4','rClose')"/>%</div>
+          <div class="jh-rate"><input type="range" id="rClose" min="0.1" max="80" step="0.1" value="20" oninput="syncRateSlider('rClose','jrate4');updateTrack(this);calcJourney()"/></div>
+        </div>
+      </div>
+    </div>
+    <!-- emails per lead + mailbox — collapsed disclosure -->
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--b0)">
+      <div style="font-size:11px;color:var(--td);cursor:pointer;display:inline-flex;align-items:center;gap:4px;user-select:none" onclick="toggleSeqPanel()" id="seqPanelToggle">
+        <span id="seqPanelArrow">▸</span> Using a 4-email sequence · 50/mailbox/day <span style="color:var(--pu);font-weight:600">Change</span>
+      </div>
+      <div id="seqPanel" style="display:none;margin-top:10px">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tm)">
+            Sequence:
+            <input type="range" id="rSeq" min="1" max="12" step="1" value="4" style="width:80px" oninput="lbl('rSeq','lblSeq');updateTrack(this);updateSeqSummary();calcJourney()"/>
+            <strong><span id="lblSeq">4</span> emails/lead</strong>
+          </div>
+          <div class="mb-inline" id="mbInlineBlock" style="margin-top:0;flex:1;min-width:180px">
+            <div class="mb-inline-txt">Total emails/mo: <strong id="totalMail">1,200</strong></div>
+            <div class="mb-inline-edit">
+              <label>Max/mailbox/day:</label>
+              <input class="iinp" type="number" id="iMbLimit" value="50" min="10" max="500" oninput="calcJourney();checkMbLimit();updateSeqSummary()"/>
+            </div>
+          </div>
+        </div>
+        <div class="mb-over-warn" id="mbOverWarn" style="width:100%;margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LinkedIn Addon — compact -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="li-toggle-row" style="margin-bottom:0">
+      <div>
+        <div class="li-toggle-label">Add LinkedIn Automation <span class="li-badge">$69/mo per slot</span></div>
+        <div class="li-toggle-sub">LI outreach on the same leads — boosts meeting rate.</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="liToggle" onchange="toggleLI()"/>
+        <div class="toggle-track"></div>
+      </label>
+    </div>
+    <div class="li-section" id="liSection">
+      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--b0)">
+        <!-- Slots stepper -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:2px">LinkedIn slots</div>
+            <div style="font-size:11px;color:var(--tm)">Each slot = 1 LinkedIn account</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:0;background:var(--s2);border:1px solid var(--b1);border-radius:9px;overflow:hidden">
+            <button class="slot-btn" onclick="changeS1LiSlots(-1)">−</button>
+            <div class="slot-count" id="s1LiSlots">1</div>
+            <button class="slot-btn" onclick="changeS1LiSlots(1)">+</button>
+          </div>
+        </div>
+        <div class="li-cost-note" id="liCostNote">1 slot × $69 = <strong>$69/mo</strong> added to plan cost</div>
+
+        <!-- LI lead count (number, not %) -->
+        <div style="margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="font-size:12px;color:var(--tm);flex:1">
+            How many of your <strong id="liLeadsTotalRef">300</strong> leads also get LinkedIn outreach?
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input class="iinp" type="number" id="iLiLeads" value="60" min="0" style="width:80px;font-size:16px" oninput="syncLiLeadCount()"/>
+            <span style="font-size:12px;color:var(--td)" id="liLeadsPct">(60%)</span>
+          </div>
+        </div>
+
+        <!-- LI rates — compact, all editable -->
+        <div style="margin-top:14px;background:var(--s2);border-radius:10px;padding:12px 14px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--td);margin-bottom:10px">LI conversion rates <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--td);font-size:10px">(editable)</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div style="text-align:center">
+              <div style="font-size:10px;color:var(--td);margin-bottom:4px">Accept rate</div>
+              <div><input type="number" class="rate-inp" id="ljrate_accept" value="30" min="1" max="80" step="1" style="font-size:20px;width:3.5ch;text-align:center" oninput="calcJourney()"/>%</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:10px;color:var(--td);margin-bottom:4px">Reply rate</div>
+              <div><input type="number" class="rate-inp" id="ljrate_reply" value="10" min="0.1" max="50" step="0.1" style="font-size:20px;width:3.5ch;text-align:center" oninput="calcJourney()"/>%</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:10px;color:var(--td);margin-bottom:4px">Meeting rate</div>
+              <div><input type="number" class="rate-inp" id="ljrate_meet" value="20" min="0.1" max="80" step="0.1" style="font-size:20px;width:3.5ch;text-align:center" oninput="calcJourney()"/>%</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--td);margin-top:8px;text-align:center" id="liProjection">—</div>
+        </div>
+
+        <!-- Hidden elements still needed by old JS references -->
+        <input type="range" id="rLiSlots" min="1" max="20" value="1" style="display:none" oninput="calcJourney()"/>
+        <input type="range" id="rLiPct" min="0" max="100" value="60" style="display:none" oninput="calcJourney()"/>
+        <input type="range" id="rLiMeet" min="0.1" max="80" step="0.1" value="20" style="display:none" oninput="calcJourney()"/>
+        <span id="lblLiPct" style="display:none">60</span>
+        <span id="lblLiSlots" style="display:none">1</span>
+        <div id="ljv1" style="display:none"></div>
+        <div id="ljv2" style="display:none"></div>
+        <div id="ljv3" style="display:none"></div>
+        <div id="ljv4" style="display:none"></div>
+        <div id="ljWinRef" style="display:none"></div>
+        <div id="ljc1" style="display:none"></div>
+        <div id="ljc2" style="display:none"></div>
+        <div id="ljc3" style="display:none"></div>
+        <div id="ljc4" style="display:none"></div>
+        <div id="liMeetBoostNote" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- hidden deal/cycle inputs still used by calc() -->
+  <input type="range" id="rDeal" min="100" max="100000" step="100" value="3000" style="display:none"/>
+  <input type="number" id="iDeal" value="3000" style="display:none"/>
+  <input type="range" id="rCycle" min="1" max="90" step="1" value="14" style="display:none"/>
+  <span id="lblDeal" style="display:none">$3k</span>
+  <span id="lblCycle" style="display:none">14</span>
+  <div id="cycleNote" style="display:none"></div>
+
+  <button class="btn-main" onclick="goReveal()">Show my possible revenue →</button>
+</div>
+
+<!-- ══════════════ STEP 2 ══════════════ -->
+<div class="screen" id="step2">
+  <div class="rev-head">
+    <h2>Your possible revenue 🚀</h2>
+    <p>Based on your funnel — this is what consistent outreach with Snov.io could generate each month.</p>
+  </div>
+
+  <div class="big-stat">
+    <div class="bs-label">Possible monthly revenue</div>
+    <div class="bs-num"><span class="bs-dollar">$</span><span id="bsRevNum">0</span></div>
+    <div class="bs-sub" id="bsSub">—</div>
+  </div>
+
+  <!-- Funnel flow boxes -->
+  <div class="funnel-flow">
+    <div class="ff-title">Your funnel at a glance</div>
+    <div class="ff-steps" id="ffSteps">
+      <div class="ff-step">
+        <div class="ff-box active"><div class="ff-box-num" id="ff1">—</div><div class="ff-box-lbl">Leads reached</div></div>
+      </div>
+      <div class="ff-arrow">→</div>
+      <div class="ff-step">
+        <div class="ff-box"><div class="ff-box-num" id="ff2">—</div><div class="ff-box-lbl">Replies</div><div class="ff-box-rate" id="ffr2">—</div></div>
+      </div>
+      <div class="ff-arrow">→</div>
+      <div class="ff-step">
+        <div class="ff-box"><div class="ff-box-num" id="ff3">—</div><div class="ff-box-lbl">Meetings</div><div class="ff-box-rate" id="ffr3">—</div></div>
+      </div>
+      <div class="ff-arrow">→</div>
+      <div class="ff-step">
+        <div class="ff-box active"><div class="ff-box-num" id="ff4">—</div><div class="ff-box-lbl">Deals won</div><div class="ff-box-rate" id="ffr4">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advanced ROI teaser -->
+  <div class="adv-roi-wrap" id="advRoiWrap">
+    <div class="adv-roi-locked" id="advRoiLocked" onclick="unlockAdvRoi()">
+      <div class="adv-roi-blur">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--tm)">Time-adjusted revenue</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--tx);filter:blur(5px)">$12,400</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="font-size:12px;color:var(--tm)">Cycle-adjusted ROI</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--pu);filter:blur(5px)">8.3×</span>
+        </div>
+      </div>
+      <div class="adv-roi-nudge">
+        <div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:3px">✦ More accurate numbers available</div>
+        <div style="font-size:12px;color:var(--tm)">Add your deal value &amp; sales cycle — see how many deals actually close each month. Tap to unlock.</div>
+      </div>
+    </div>
+    <div class="adv-roi-open" id="advRoiOpen" style="display:none">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--pu);margin-bottom:14px">Advanced ROI inputs</div>
+      <!-- Deal value -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <div style="font-size:13px;font-weight:600;color:var(--tx);min-width:120px">Average deal value</div>
+        <div style="display:flex;align-items:baseline;gap:4px;flex:1">
+          <div style="font-size:20px;font-weight:700;color:var(--td)">$</div>
+          <input class="bnum-inp" type="number" id="iDeal2" value="3000" min="1" style="font-size:28px;width:120px" oninput="syncDeal2()"/>
+        </div>
+        <input type="range" id="rDeal2" min="100" max="100000" step="100" value="3000" style="flex:2;min-width:120px" oninput="syncDeal2Range()"/>
+        <div style="font-size:13px;font-weight:700;color:var(--pu);min-width:48px;text-align:right" id="lblDeal2">$3k</div>
+      </div>
+      <!-- Closing cycle -->
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="font-size:13px;font-weight:600;color:var(--tx);min-width:120px">Sales closing cycle</div>
+        <div style="display:flex;align-items:center;gap:8px;flex:1">
+          <input type="range" id="rCycle2" min="1" max="90" step="1" value="14" style="flex:1;min-width:120px" oninput="syncCycle2()"/>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--pu);min-width:56px;text-align:right"><span id="lblCycle2">14</span>d</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--td);margin-top:8px" id="cycleNote2"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--b0);font-size:12px;color:var(--tm)">↑ The possible revenue figure above updates live as you adjust these.</div>
+    </div>
+  </div>
+
+  <!-- Mailbox block + benchmarks -->
+  <div class="mb-block" style="margin-top:8px">
+    <div class="mb-ico">
+      <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+    </div>
+    <div class="mb-body-wrap" style="flex:1">
+      <div class="mb-title">Minimum mailboxes you'll need</div>
+      <div class="mb-desc" id="mbDesc">Calculating…</div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:8px">
+        <div class="mb-pill">
+          <div class="mb-pill-num" id="mbCount">2</div>
+          <div class="mb-pill-txt">mailboxes minimum</div>
+        </div>
+        <div style="font-size:12px;color:var(--tm);line-height:1.6">Spread across domains for<br/>better deliverability</div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <button class="btn-main" onclick="goPlan()" style="margin-top:14px">See my plan &amp; ROI →</button>
+  <div style="text-align:center;margin-top:12px"><button class="btn-ghost" onclick="goStep(1)">← Adjust numbers</button></div>
+</div>
+
+<!-- ══════════════ STEP 3 ══════════════ -->
+<div class="screen" id="step3">
+  <div class="plan-head">
+    <h2>Your recommended plan 🎯</h2>
+    <p>Matched to your lead volume &amp; team. Flip the card to compare all plans &amp; billing cycles.</p>
+  </div>
+  <div style="text-align:center"><div class="rec-badge">✦ Best match for your usage</div></div>
+
+  <!-- ROI FIRST — flip card (back visible only after typing "snov") -->
+  <div style="perspective:1200px;margin-bottom:14px" id="roiFlipScene">
+    <div id="roiFlipCard" style="position:relative;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.35,0,.2,1);cursor:default">
+
+      <!-- FRONT: the normal ROI hero -->
+      <div class="roi-hero" onclick="flipRoiCard()" style="margin-bottom:0;backface-visibility:hidden;-webkit-backface-visibility:hidden">
+        <div class="roi-hero-left">
+          <div class="roi-hero-label">ROI</div>
+          <div class="roi-hero-num" id="roiHlNum">—</div>
+          <div id="roiHlSub" style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:5px">for every $1 spent</div>
+          <div id="roiDiscourage" style="display:none;margin-top:8px;font-size:11px;color:var(--am);line-height:1.5;max-width:200px"></div>
+          <!-- subtle hint only when snov mode active -->
+          <div id="roiFlipHint" style="display:none;margin-top:10px;font-size:10px;color:rgba(255,255,255,0.25);cursor:pointer" onclick="flipRoiCard()">↺ tap for breakdown</div>
+        </div>
+        <div class="roi-hero-right">
+          <div class="rb-rows">
+            <div class="rb-row">
+              <div class="rb-lbl">Possible rev.</div>
+              <div class="rb-track"><div class="rb-fill pu" id="rbRev" style="width:0%"></div></div>
+              <div class="rb-amt" id="rbRevAmt">—</div>
+            </div>
+            <div class="rb-row">
+              <div class="rb-lbl">Plan cost</div>
+              <div class="rb-track"><div class="rb-fill td" id="rbCost" style="width:0%"></div></div>
+              <div class="rb-amt" id="rbCostAmt">—</div>
+            </div>
+            <div class="rb-row">
+              <div class="rb-lbl">Net value</div>
+              <div class="rb-track"><div class="rb-fill gr" id="rbNet" style="width:0%"></div></div>
+              <div class="rb-amt" id="rbNetAmt">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BACK: ROI breakdown explanation -->
+      <div onclick="flipRoiCard()" style="position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);border-radius:18px;background:linear-gradient(150deg,#1A0E42,#2D1B6B);padding:22px 24px;box-shadow:0 8px 40px rgba(91,52,217,0.22);overflow:auto">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px">Why this ROI</div>
+        <div id="roiBreakdownContent" style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.7"></div>
+        <div style="margin-top:16px;font-size:10px;color:rgba(255,255,255,0.2);cursor:pointer" onclick="flipRoiCard()">↺ flip back</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COST PER MEETING STAT -->
+  <div style="margin-bottom:12px">
+    <div class="card" style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--td);margin-bottom:5px">Cost per meeting booked</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--pu)" id="s3Cpm">—</div>
+      </div>
+      <div style="font-size:11px;color:var(--td);text-align:right;line-height:1.6">total monthly spend<br/>÷ meetings from all channels</div>
+    </div>
+  </div>
+
+  <!-- PLAN FLIP CARD -->
+  <div class="plan-scene">
+    <div class="plan-card" id="planCard">
+
+      <!-- FRONT -->
+      <div class="plan-face pf-front" id="pfFront" onclick="flipPlan()">
+        <div class="mw-overlay" id="mwOverlay"></div>
+        <div class="monthly-warning" id="monthlyWarn">
+          <div class="mw-title">⚠️ Heads up!</div>
+          <div class="mw-body" id="mwBody">Monthly billing can make it harder to see real results…</div>
+          <span class="mw-dismiss" onclick="dismissWarn(event)">Got it, keep monthly</span>
+        </div>
+
+        <div class="pf-top">
+          <div class="pf-name" id="pfName">Pro S</div>
+          <div class="pf-badges">
+            <div class="badge-rec">Recommended</div>
+            <div class="badge-ob" id="obBadge">🎓 Personal Onboarding</div>
+          </div>
+        </div>
+        <div class="bil-tog">
+          <button class="btog" data-b="monthly" onclick="setBil('monthly',event)">Monthly</button>
+          <button class="btog" data-b="quarterly" onclick="setBil('quarterly',event)">3-Month<span class="stag">−5%</span></button>
+          <button class="btog on" data-b="annual" onclick="setBil('annual',event)">Annual<span class="stag">−25%</span></button>
+        </div>
+        <div class="price-row">
+          <div class="price-pfx">$</div>
+          <div class="price-main" id="pfPrice">74.25</div>
+          <div class="price-per">/mo</div>
+        </div>
+        <div class="price-note" id="pfNote">Billed annually · save 25% vs monthly</div>
+        <div class="chip-row" id="pfChips"></div>
+        <div class="flip-hint">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+          Tap to compare all billing cycles &amp; plans
+        </div>
+      </div>
+
+      <!-- BACK -->
+      <div class="plan-face plan-back-face pf-back" onclick="flipPlan()">
+        <div class="pb-title" id="pbTitle">All billing options — Pro S</div>
+        <div class="plan-pills" id="planPills"></div>
+        <div class="bil-cols" id="bilCols"></div>
+        <div style="margin-top:18px">
+          <div class="flip-hint">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+            Tap to flip back
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAN FIT WARNING (shown when user switches to incompatible plan) -->
+  <div class="plan-warn" id="planWarn" style="margin-bottom:12px">
+    <div class="plan-warn-title" id="planWarnTitle"></div>
+    <div id="planWarnBody"></div>
+  </div>
+
+  <!-- TOTAL COST BREAKDOWN -->
+  <div class="cost-breakdown" id="costBreakdown">
+    <div class="cb-title">What you'll pay / month</div>
+    <div class="cb-rows" id="cbRows"><!-- filled by JS --></div>
+    <div class="cb-total-row">
+      <div class="cb-total-label">Total</div>
+      <div class="cb-total-val" id="cbTotal">—</div>
+    </div>
+    <!-- LI slot adjuster -->
+    <div class="li-adj-row" id="liAdjRow" style="display:none">
+      <div class="li-adj-label">LinkedIn slots included</div>
+      <div class="slot-stepper">
+        <button class="slot-btn" onclick="adjustLiSlots(-1)">−</button>
+        <div class="slot-count" id="s3LiSlots">1</div>
+        <button class="slot-btn" onclick="adjustLiSlots(1)">+</button>
+      </div>
+      <div style="font-size:12px;color:var(--td)">× $69/mo</div>
+    </div>
+    <div class="li-roi-impact" id="liRoiImpact"></div>
+    <div id="cbDiscountNote" style="display:none"></div>
+  </div>
+
+  <div style="text-align:center;margin-top:18px"><button class="btn-ghost" onclick="goStep(2)">← Back to revenue</button></div>
+</div>
+
+<footer>
+  Estimates based on your inputs. Actual results vary by industry and team. Pricing from <a href="https://snov.io/pricing" target="_blank">snov.io/pricing</a>.
+  Apollo pricing: Basic $49, Pro $79, Org $119 per user/mo (annual 2026).
+</footer>
+</div>
+
+<!-- HIDDEN DISCOUNT PANEL — activated via Konami or URL param -->
+<div class="discount-panel" id="discountPanel">
+  <div class="dp-title">🔒 Offer Override</div>
+  <div class="dp-row">
+    <label>Plan discount (%)</label>
+    <input class="dp-inp" type="number" id="dpPlanDisc" value="0" min="0" max="80" placeholder="0" oninput="applyDiscount()"/>
+  </div>
+  <div class="dp-row">
+    <label>LIA discount (%)</label>
+    <input class="dp-inp" type="number" id="dpLiaDisc" value="0" min="0" max="80" placeholder="0" oninput="applyDiscount()"/>
+  </div>
+  <div class="dp-active-badge" id="dpBadge">Discount active</div>
+  <div class="dp-close" onclick="document.getElementById('discountPanel').classList.remove('show')">Close panel ↓</div>
+</div>
+
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────
+// mo = base monthly price. annual = mo*0.75 (-25%). quarterly = mo*0.95 (-5%).
+const PLANS = [
+  {id:'starter',name:'Starter',mo:39,  credits:1000,  rcpt:5000,   isPro:false},
+  {id:'pro-s',  name:'Pro S',  mo:99,  credits:5000,  rcpt:25000,  isPro:true},
+  {id:'pro-m',  name:'Pro M',  mo:189, credits:20000, rcpt:50000,  isPro:true},
+  {id:'pro-l',  name:'Pro L',  mo:369, credits:50000, rcpt:100000, isPro:true},
+  {id:'ultra',  name:'Ultra',  mo:738, credits:100000,rcpt:200000, isPro:true},
+];
+function prices(p){ return {monthly:p.mo, quarterly:+(p.mo*0.95).toFixed(2), annual:+(p.mo*0.75).toFixed(2)} }
+function getPlanCost(){ return prices(PLANS[planIdx])[billing]; }
+// Returns POB description for a plan + billing combo
+function getPob(p, b){
+  if(!p.isPro) return '📹 Recorded onboarding only';
+  const isAnnual = b==='annual';
+  const isProSM = p.id==='pro-s'||p.id==='pro-m';
+  const isProLU = p.id==='pro-l'||p.id==='ultra';
+  if(isProSM){
+    return isAnnual ? '🎓 4 Onboarding Calls + 1 Q&A Call' : '🎓 4 Onboarding Calls';
+  }
+  if(isProLU){
+    return isAnnual ? '🎓 4 Onboarding Calls + 4 Q&A Calls' : '🎓 6 Onboarding Calls';
+  }
+  return '';
+}
+
+let billing='annual', planIdx=1, teamSize=1, R={}, liEnabled=false;
+let warnDismissed=false;
+let s3LiSlots=1; // LI slots on Step 3 (independent adjuster)
+let discountActive=false, planDiscount=0, liaDiscount=0; // hidden discount override
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function fN(n){n=parseFloat(n)||0;if(n>=1e6)return (n/1e6).toFixed(1)+'M';if(n>=1000)return Math.round(n/1e3)+'k';return Math.round(n)+'';}
+function fm(n){if(n>=1e6)return '$'+(n/1e6).toFixed(1)+'M';if(n>=1000)return '$'+Math.round(n/1e3)+'k';return '$'+Math.round(n);}
+function lbl(rid,lid){document.getElementById(lid).textContent=document.getElementById(rid).value;calcJourney();}
+function sSync(nid,rid,lid,fmt){const v=document.getElementById(nid).value;document.getElementById(rid).value=v;document.getElementById(lid).textContent=fmt(v);updateTrack(document.getElementById(rid));if(nid==='iLeads'){const r=document.getElementById('liLeadsTotalRef');if(r)r.textContent=Math.round(parseFloat(v)||0).toLocaleString();}calcJourney();}
+function rSync(rid,nid,lid,fmt){const v=document.getElementById(rid).value;document.getElementById(nid).value=v;document.getElementById(lid).textContent=fmt(v);}
+function updateTrack(el){const mn=+el.min||0,mx=+el.max||100,v=+el.value||0,p=(v-mn)/(mx-mn)*100;el.style.background=`linear-gradient(to right,var(--pu) 0%,var(--pu) ${p}%,var(--s3) ${p}%,var(--s3) 100%)`;}
+function setTeam(v){teamSize=v;document.querySelectorAll('.tpill').forEach(p=>p.classList.toggle('on',+p.dataset.v===v));}
+function toggleNewLeadsSplit(){
+  const p=document.getElementById('newLeadsSplitPanel');
+  const a=document.getElementById('newLeadsSplitArrow');
+  const open=p.style.display==='none';
+  p.style.display=open?'block':'none';
+  a.textContent=open?'▾':'▸';
+}
+function toggleSeqPanel(){
+  const p=document.getElementById('seqPanel');
+  const a=document.getElementById('seqPanelArrow');
+  const open=p.style.display==='none';
+  p.style.display=open?'block':'none';
+  a.textContent=open?'▾':'▸';
+}
+function updateSeqSummary(){
+  const seq=document.getElementById('lblSeq').textContent||'4';
+  const lim=document.getElementById('iMbLimit').value||'80';
+  const t=document.getElementById('seqPanelToggle');
+  if(t) t.innerHTML='<span id="seqPanelArrow">'+
+    (document.getElementById('seqPanel').style.display==='none'?'▸':'▾')+
+    '</span> Using a '+seq+'-email sequence · '+lim+'/mailbox/day <span style="color:var(--pu);font-weight:600">Change</span>';
+}
+
+// Step 1 LI slot stepper (separate from Step 3 stepper)
+let s1LiSlots=1;
+function changeS1LiSlots(d){
+  s1LiSlots=Math.max(1,Math.min(20,s1LiSlots+d));
+  document.getElementById('s1LiSlots').textContent=s1LiSlots;
+  document.getElementById('rLiSlots').value=s1LiSlots;
+  const cost=s1LiSlots*69;
+  document.getElementById('liCostNote').innerHTML=s1LiSlots+' slot'+(s1LiSlots>1?'s':'')+' × $69 = <strong>$'+cost+'/mo</strong> added to plan cost';
+  calcJourney();
+}
+
+// Sync LI lead count input (number of leads, not %)
+function syncLiLeadCount(){
+  const total=parseFloat(document.getElementById('iLeads').value)||0;
+  let n=parseFloat(document.getElementById('iLiLeads').value)||0;
+  n=Math.min(n,total);
+  const pct=total>0?Math.round(n/total*100):0;
+  document.getElementById('liLeadsPct').textContent='('+pct+'%)';
+  document.getElementById('rLiPct').value=pct;
+  document.getElementById('lblLiPct').textContent=pct;
+  const ref=document.getElementById('liLeadsTotalRef');
+  if(ref) ref.textContent=Math.round(total).toLocaleString();
+  calcJourney();
+}
+
+// Advanced ROI on Step 2
+let advRoiUnlocked=false;
+function unlockAdvRoi(){
+  advRoiUnlocked=true;
+  document.getElementById('advRoiLocked').style.display='none';
+  document.getElementById('advRoiOpen').style.display='block';
+  updateAdvRoi();
+}
+function syncDeal2(){
+  const v=document.getElementById('iDeal2').value;
+  document.getElementById('rDeal2').value=v;
+  document.getElementById('lblDeal2').textContent='$'+fN(v);
+  document.getElementById('iDeal').value=v;
+  document.getElementById('rDeal').value=v;
+  updateAdvRoi(); updateStep2Revenue(); updateRoiBlock();
+}
+function syncDeal2Range(){
+  const v=document.getElementById('rDeal2').value;
+  document.getElementById('iDeal2').value=v;
+  document.getElementById('lblDeal2').textContent='$'+fN(v);
+  document.getElementById('iDeal').value=v;
+  document.getElementById('rDeal').value=v;
+  updateTrack(document.getElementById('rDeal2'));
+  updateAdvRoi(); updateStep2Revenue(); updateRoiBlock();
+}
+function syncCycle2(){
+  const v=document.getElementById('rCycle2').value;
+  document.getElementById('lblCycle2').textContent=v;
+  document.getElementById('rCycle').value=v;
+  document.getElementById('lblCycle').textContent=v;
+  updateTrack(document.getElementById('rCycle2'));
+  updateCycleNote2();
+  updateAdvRoi(); updateStep2Revenue(); updateRoiBlock();
+}
+
+// Re-render Step 2 big number when AoV or cycle changes, with lottery scroll
+function updateStep2Revenue(){
+  const dv=parseFloat(document.getElementById('iDeal2').value)||3000;
+  const cycle=parseFloat(document.getElementById('rCycle2').value)||14;
+  const cr=parseFloat(document.getElementById('rClose').value)/100||0;
+  const mr=parseFloat(document.getElementById('rMeet').value)/100||0;
+  const rr=parseFloat(document.getElementById('rReply').value)/100||0;
+  // read leads live — don't depend on R being populated
+  const leads=parseFloat(document.getElementById('iLeads').value)||0;
+  if(!leads) return;
+  const rawMeets=leads*rr*mr;
+  const liMeets=R.liExtraMeets||0;
+  const frac=Math.max(0,(30-cycle)/30);
+  const monthlyDealsRaw=(rawMeets+liMeets)*cr*frac;
+  const monthlyRev=monthlyDealsRaw*dv;
+  // lottery scroll the big number
+  const el=document.getElementById('bsRevNum');
+  if(el){
+    el.style.opacity='0'; el.style.transform='translateY(28px)'; el.style.transition='none';
+    setTimeout(()=>{
+      el.textContent=fN(monthlyRev);
+      el.style.transition='opacity .35s ease,transform .38s cubic-bezier(.22,1,.36,1)';
+      el.style.opacity='1'; el.style.transform='translateY(0)';
+    },80);
+  }
+  const sub=document.getElementById('bsSub');
+  if(sub){
+    const dealsDisplay=monthlyDealsRaw>=0.01?monthlyDealsRaw.toFixed(1):'<0.1';
+    const cycleAdj=frac<1?' · '+Math.round(frac*100)+'% closeable/mo':'';
+    sub.textContent=dealsDisplay+' deals/mo'+cycleAdj+' · $'+fN(dv)+' avg';
+  }
+}
+function updateCycleNote2(){
+  const c=parseFloat(document.getElementById('rCycle2').value)||14;
+  const frac=Math.max(0,(30-c)/30);
+  const pct=Math.round(frac*100);
+  const el=document.getElementById('cycleNote2');
+  if(!el) return;
+  if(c<=7) el.textContent='Short cycle — most meetings close this month ('+pct+'% closeable).';
+  else if(c<=21) el.textContent='~'+pct+"% of this month's meetings close before month-end.";
+  else el.textContent='Only ~'+pct+'% close this month. ROI compounds over longer period.';
+}
+function updateAdvRoi(){
+  if(!advRoiUnlocked||!R.totalMeets) return;
+  const billingMonths=billing==='annual'?12:billing==='quarterly'?3:1;
+  const cycle=parseFloat(document.getElementById('rCycle2').value)||14;
+  const dv=parseFloat(document.getElementById('iDeal2').value)||2000;
+  const frac=Math.max(0,(30-cycle)/30);
+  const winRate=R.totalMeets>0?R.totalDeals/R.totalMeets:0;
+  const rawMeets=R.closeableFraction>0?R.totalMeets/R.closeableFraction:R.totalMeets;
+  const adjDeals=roundDeals(rawMeets*winRate*frac*billingMonths); // accumulate over period then round
+  const adjRev=(adjDeals*dv)/billingMonths; // back to monthly for display
+  const planCost=R.planCost||1;
+  const roi=planCost>0?adjRev/planCost:0;
+  updateStep2Revenue(); // feeds into main Step 2 big stat
+}
+function syncNewLeads(){
+  const total=parseFloat(document.getElementById('iLeads').value)||0;
+  let newL=parseFloat(document.getElementById('iNewLeads').value)||0;
+  if(newL>total){ newL=total; document.getElementById('iNewLeads').value=total; }
+  const note=document.getElementById('newLeadsNote');
+  if(note){
+    if(newL===total) note.textContent='All '+Math.round(total).toLocaleString()+' leads are new — uses '+Math.round(newL).toLocaleString()+' credits/mo';
+    else if(newL===0) note.textContent='No new leads found — 0 credits used. All outreach to existing contacts.';
+    else note.textContent=Math.round(newL).toLocaleString()+' new (credits) + '+Math.round(total-newL).toLocaleString()+' existing contacts';
+  }
+  calcJourney();
+}
+function updateCycleNote(){
+  const c=parseFloat(document.getElementById('rCycle').value)||14;
+  const frac=Math.max(0,(30-c)/30);
+  const pct=Math.round(frac*100);
+  const el=document.getElementById('cycleNote');
+  if(!el) return;
+  if(c<=7) el.textContent='Short cycle — most meetings booked this month will close this month ('+pct+'% closeable).';
+  else if(c<=21) el.textContent='With a '+c+"-day cycle, ~"+pct+"% of this month's meetings can realistically close before month-end.";
+  else if(c<=45) el.textContent='Longer cycle — only ~'+pct+'% of meetings close within the same month. ROI is spread across months.';
+  else el.textContent='At '+c+' days, most deals close next month or later. Monthly revenue figures will be conservative.';
+}
+function updateLiDailyDisplay(daily){
+  daily=parseFloat(daily)||30;
+  const slots=parseFloat(document.getElementById('rLiSlots').value)||1;
+  const monthly=Math.round(slots*daily*22);
+  const dc=document.getElementById('liDailyCalc'); if(dc) dc.textContent=daily;
+  const lc=document.getElementById('liMonthlyCalc'); if(lc) lc.textContent=monthly.toLocaleString();
+  const ll=document.getElementById('lblLiDaily'); if(ll) ll.textContent=daily;
+}
+function toggleLI(){
+  liEnabled=document.getElementById('liToggle').checked;
+  document.getElementById('liSection').classList.toggle('show',liEnabled);
+  // set LI meeting rate = email meeting rate + 10, capped at 80
+  if(liEnabled){
+    const emailMeet=parseFloat(document.getElementById('rMeet').value)||30;
+    const liMeet=Math.min(80,(emailMeet+10));
+    const _rlm2=document.getElementById('rLiMeet'); if(_rlm2){_rlm2.value=liMeet;updateTrack(_rlm2);}
+    const _jr32=document.getElementById('ljrate3'); if(_jr32)_jr32.value=liMeet;
+  }
+  if(liEnabled){ const sl=document.getElementById('s1LiSlots'); if(sl) sl.textContent=s1LiSlots; const ref=document.getElementById('liLeadsTotalRef'); const tot=parseFloat(document.getElementById('iLeads').value)||0; if(ref) ref.textContent=tot.toLocaleString(); const liL=document.getElementById('iLiLeads'); if(liL&&!liL.dataset.set){liL.value=Math.round(tot*0.6);liL.dataset.set='1';syncLiLeadCount();} }
+  calcJourney();
+}
+
+// two-way sync: typing in the number input updates the slider
+function syncRateInp(inpId, sliderId){
+  const inp=document.getElementById(inpId);
+  const sl=document.getElementById(sliderId);
+  let v=parseFloat(inp.value)||0;
+  v=Math.min(+sl.max,Math.max(+sl.min,v));
+  sl.value=v;
+  updateTrack(sl);
+  calcJourney();
+}
+// two-way sync: dragging the slider updates the number input
+function syncRateSlider(sliderId, inpId){
+  document.getElementById(inpId).value=document.getElementById(sliderId).value;
+}
+// keep LI meet rate = email meet rate + 10 (unless user manually edited it)
+function syncLiMeet(){
+  if(!liEnabled) return;
+  const emailMeet=parseFloat(document.getElementById('rMeet').value)||30;
+  const liMeet=Math.min(80,+(emailMeet+10).toFixed(1));
+  const _rlm=document.getElementById('rLiMeet'); if(_rlm)_rlm.value=liMeet;
+  const _jr3=document.getElementById('ljrate3'); if(_jr3)_jr3.value=liMeet;
+  updateTrack(document.getElementById('rLiMeet'));
+}
+
+
+// ── PLAN FIT CHECK (Step 3 only — called from swPlan) ───────────────────
+function checkPlanFit(){
+  // requiredIdx = the plan that auto-fit the user's leads
+  const leads=R.leads||0;
+  let requiredIdx=PLANS.length-1;
+  for(let i=0;i<PLANS.length;i++){ if(leads<=PLANS[i].rcpt){requiredIdx=i;break;} }
+
+  const warn=document.getElementById('planWarn');
+  const title=document.getElementById('planWarnTitle');
+  const body=document.getElementById('planWarnBody');
+  if(!warn) return;
+
+  const gap=planIdx-requiredIdx; // negative = user selected plan BELOW required
+
+  if(gap<=-2){
+    // 2+ tiers below required — grave
+    const reqPlan=PLANS[requiredIdx];
+    const selPlan=PLANS[planIdx];
+    warn.className='plan-warn show grave';
+    title.textContent="We're a little worried about this one.";
+    body.innerHTML=selPlan.name+" supports up to "+selPlan.rcpt.toLocaleString()+" recipients/month. At "+Math.round(leads).toLocaleString()+" leads, you'd hit that ceiling in days and lose the rest of your pipeline. The numbers on this page won't hold up. <strong>"+reqPlan.name+" is the minimum that works for your volume.</strong>";
+  } else if(gap===-1){
+    // 1 tier below — witty nudge
+    const reqPlan=PLANS[requiredIdx];
+    const selPlan=PLANS[planIdx];
+    warn.className='plan-warn show witty';
+    title.textContent="Not quite the right fit.";
+    body.textContent=selPlan.name+" caps out at "+selPlan.rcpt.toLocaleString()+" recipients. You're running "+Math.round(leads).toLocaleString()+" leads. That's "+Math.round(leads-selPlan.rcpt).toLocaleString()+" people who just won't hear from you. "+reqPlan.name+" is one step up \u2014 and the ROI difference is real.";
+  } else {
+    // selected plan fits or is above required — no warning
+    warn.className='plan-warn';
+  }
+}
+
+// ── JOURNEY LIVE UPDATE ───────────────────────────────────────────────────
+function calcJourney(){
+  const leads=parseFloat(document.getElementById('iLeads').value)||0;
+  const seq=parseFloat(document.getElementById('rSeq').value)||1;
+  const lim=parseFloat(document.getElementById('iMbLimit').value)||80;
+  const rr=parseFloat(document.getElementById('rReply').value)/100;
+  const mr=parseFloat(document.getElementById('rMeet').value)/100;
+  const cr=parseFloat(document.getElementById('rClose').value)/100;
+  const total=Math.round(leads*seq);
+  document.getElementById('totalMail').textContent=total.toLocaleString();
+  const replies=leads*rr, meets=replies*mr, deals=meets*cr;
+  document.getElementById('jv1').textContent=Math.round(leads).toLocaleString();
+  document.getElementById('jv2').textContent=Math.round(replies).toLocaleString();
+  document.getElementById('jv3').textContent=Math.round(meets).toLocaleString();
+  document.getElementById('jv4').textContent=deals.toFixed(1);
+  [['jc2',replies>0],['jc3',meets>0],['jc4',deals>0]].forEach(([id,active])=>{
+    document.getElementById(id).classList.toggle('filled',active);
+  });
+  // LinkedIn — subset of email leads, boosts meeting rate
+  if(liEnabled){
+    const slots=s1LiSlots||parseFloat(document.getElementById('rLiSlots').value)||1;
+    const liPctEl=document.getElementById('iLiLeads'); const liPct=liPctEl?Math.min(1,(parseFloat(liPctEl.value)||0)/(parseFloat(document.getElementById('iLeads').value)||1)):parseFloat(document.getElementById('rLiPct').value)/100;
+    const liLeads=Math.round(leads*liPct);
+    const liMrEl=document.getElementById('ljrate_meet'); const liMr=(liMrEl?parseFloat(liMrEl.value):parseFloat(document.getElementById('rLiMeet').value)||20)/100;
+    // LI-touched leads: replies already counted in email, but meeting rate is boosted
+    const liMeetBoost=(liMr-mr); // extra meeting rate from LI (LI meet rate - email meet rate)
+    const liExtraMeets=Math.max(0,leads*liPct*rr*liMeetBoost); // extra meetings from LI boost
+    const liDeals=liExtraMeets*cr;
+    document.getElementById('ljv1').textContent=liLeads.toLocaleString();
+    document.getElementById('ljv2').textContent=Math.round(liExtraMeets).toLocaleString();
+    if(document.getElementById('liMeetBoostNote'))
+      document.getElementById('liMeetBoostNote').textContent=
+        'LI lifts meeting rate from '+Math.round(mr*100)+'% to '+Math.round(liMr*100)+'% for '+liLeads.toLocaleString()+' leads (+'+Math.max(0,Math.round((liMr-mr)*100))+'pp)';
+    const liMeets2=leads*liPct*rr*liMr; // total meetings from LI-touched leads
+    if(document.getElementById('ljv3')) document.getElementById('ljv3').textContent=Math.round(liMeets2).toLocaleString();
+    if(document.getElementById('ljv4')) document.getElementById('ljv4').textContent=liDeals.toFixed(1);
+    if(document.getElementById('ljWinRef')) document.getElementById('ljWinRef').textContent=(cr*100).toFixed(1);
+    [['ljc2',liExtraMeets>0],['ljc3',liMeets2>0],['ljc4',liDeals>0]].forEach(([id,active])=>{
+      const el=document.getElementById(id); if(el) el.classList.toggle('filled',active);
+    });
+    const liCost=slots*69;
+    document.getElementById('liCostNote').innerHTML=slots+' slot'+(slots>1?'s':'')+' × $69 = <strong>$'+liCost+'/mo</strong> added to plan cost';
+  }
+}
+
+// ── MAILBOX LIMIT WARNING ─────────────────────────────────────────────────
+const MB_JOKES=[
+  "That's more emails than a Nigerian prince has sent in his entire career. Your domain will not survive this.",
+  "Inbox providers have a word for people who send this much: 'blocked'. Also, several other words.",
+  "Bold strategy. The spam folder is watching you with great interest.",
+  "Your sender reputation just filed a restraining order.",
+  "Gmail's spam filter would like to have a word with you. Several, actually.",
+];
+function checkMbLimit(){
+  const lim=parseFloat(document.getElementById('iMbLimit').value)||0;
+  const warn=document.getElementById('mbOverWarn');
+  const block=document.getElementById('mbInlineBlock');
+  if(lim>80){
+    const joke=MB_JOKES[Math.floor(Math.random()*MB_JOKES.length)];
+    warn.textContent='⚠️ '+joke+' Max recommended is 80–100/day to protect deliverability.';
+    warn.classList.add('show');
+    block.classList.add('over-limit');
+  } else {
+    warn.classList.remove('show');
+    block.classList.remove('over-limit');
+  }
+}
+
+
+// Round deals: only count a deal if decimal part >= 0.75, otherwise floor
+function roundDeals(n){ return Math.floor(n)+(((n%1)>=0.75)?1:0); }
+
+// ── CALC ──────────────────────────────────────────────────────────────────
+function calc(){
+  const leads=parseFloat(document.getElementById('iLeads').value)||0;
+  const seq=parseFloat(document.getElementById('rSeq').value)||1;
+  const lim=parseFloat(document.getElementById('iMbLimit').value)||80;
+  const rr=parseFloat(document.getElementById('rReply').value)/100;
+  const mr=parseFloat(document.getElementById('rMeet').value)/100;
+  const cr=parseFloat(document.getElementById('rClose').value)/100;
+  const dv=parseFloat(document.getElementById('iDeal').value)||0;
+  const total=Math.round(leads*seq);
+  const replies=leads*rr, meets=replies*mr, deals=meets*cr;
+  // LinkedIn — improves meeting rate for a subset of email leads
+  let liCost=0, liExtraMeets=0, liDeals=0, liLeadCount=0;
+  if(liEnabled){
+    const slots=s1LiSlots||parseFloat(document.getElementById('rLiSlots').value)||1;
+    const liPctEl=document.getElementById('iLiLeads'); const liPct=liPctEl?Math.min(1,(parseFloat(liPctEl.value)||0)/(parseFloat(document.getElementById('iLeads').value)||1)):parseFloat(document.getElementById('rLiPct').value)/100;
+    const liMrEl=document.getElementById('ljrate_meet'); const liMr=(liMrEl?parseFloat(liMrEl.value):parseFloat(document.getElementById('rLiMeet').value)||20)/100;
+    liCost=slots*69;
+    liLeadCount=Math.round(leads*liPct);
+    // Extra meetings = LI-touched leads × reply rate × (LI meet rate - email meet rate)
+    liExtraMeets=Math.max(0,leads*liPct*rr*(liMr-mr));
+    liDeals=liExtraMeets*cr;
+  }
+  const newLeads=parseFloat(document.getElementById('iNewLeads').value)||leads;
+  const totalMeets=meets+liExtraMeets;
+  // Closing cycle adjustment: meetings booked in last N days can't close this month
+  // Closeable fraction = (30 - cycle) / 30, floored at 0
+  const cycle=parseFloat(document.getElementById('rCycle').value)||14;
+  const closeableFraction=Math.max(0,(30-cycle)/30);
+  // Apply to deals (meetings × win rate × closeable fraction)
+  const adjDeals=deals*closeableFraction;  // keep fractional — round only at display/revenue layer
+  const adjLiDeals=liDeals*closeableFraction;
+  const totalDeals=adjDeals+adjLiDeals;
+  const rev=totalDeals*dv;
+  // raw (unadjusted) for display context
+  const rawTotalDeals=(meets+liExtraMeets)*(parseFloat(document.getElementById('rClose').value)/100);
+  const mbNeeded=Math.ceil(total/(22*lim));
+  // Plan selection: credits driven by newLeads, recipients by total leads
+  // Pick plan that satisfies BOTH constraints
+  let pi=0;
+  for(let i=0;i<PLANS.length;i++){
+    const p=PLANS[i];
+    if(leads<=p.rcpt && newLeads<=p.credits){ pi=i; break; }
+    pi=PLANS.length-1;
+  }
+  planIdx=pi;
+  const planCost=getPlanCost()+liCost;
+  const roi=planCost>0?rev/planCost:0;
+  const cpd=totalDeals>0?planCost/totalDeals:null;
+  const cpm=totalMeets>0?planCost/totalMeets:null;
+  R={leads,newLeads,seq,lim,total,replies,meets,deals:adjDeals,liExtraMeets,liDeals:adjLiDeals,liLeadCount,liCost,
+     totalMeets,totalDeals,rawTotalDeals,rev,roi,cpd,cpm,planCost,dv,mbNeeded,teamSize,liEnabled,cycle,closeableFraction};
+  return R;
+}
+
+// ── ANIMATE COUNT UP ─────────────────────────────────────────────────────
+function animCount(el,target,dur=1000,prefix='',suffix=''){
+  const t0=performance.now();
+  const fmt=v=>{
+    if(v>=1e6)return prefix+(v/1e6).toFixed(1)+'M'+suffix;
+    if(v>=1000)return prefix+Math.round(v/1e3)+'k'+suffix;
+    return prefix+Math.round(v)+suffix;
+  };
+  (function step(now){
+    const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);
+    el.textContent=fmt(target*e);
+    if(p<1)requestAnimationFrame(step);else el.textContent=fmt(target);
+  })(t0);
+}
+
+// ── LOTTERY SCROLL ────────────────────────────────────────────────────────
+function lotteryScroll(el, newVal, fmt){
+  el.style.opacity='0';
+  el.style.transform='translateY(30px)';
+  el.style.transition='none';
+  setTimeout(()=>{
+    el.textContent=fmt(newVal);
+    el.style.transition='opacity .35s ease, transform .38s cubic-bezier(.22,1,.36,1)';
+    el.style.opacity='1';
+    el.style.transform='translateY(0)';
+  },120);
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function goStep(n){
+  document.querySelectorAll('.screen').forEach((s,i)=>s.classList.toggle('active',i===n-1));
+  for(let i=1;i<=3;i++){
+    const ps=document.getElementById('ps'+i);
+    ps.classList.remove('active','done');
+    if(i<n)ps.classList.add('done');if(i===n)ps.classList.add('active');
+  }
+  for(let i=1;i<=2;i++)document.getElementById('pl'+i).classList.toggle('done',i<n);
+  document.getElementById('progBar').style.width=[33,66,100][n-1]+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goReveal(){
+  const r=calc();goStep(2);
+  setTimeout(()=>{
+    animCount(document.getElementById('bsRevNum'),r.rev,1050);
+    const cycleAdj=r.closeableFraction<1?' ('+Math.round(r.closeableFraction*100)+'% closeable this month)':'';
+    const dealDesc=r.liEnabled
+      ? `${r.deals.toFixed(1)} email + ${r.liDeals.toFixed(1)} LI-boosted = ${r.totalDeals.toFixed(1)} total deals${cycleAdj} × ${fm(r.dv)}`
+      : `${r.totalDeals.toFixed(1)} deals${cycleAdj} × ${fm(r.dv)} avg deal value`;
+    document.getElementById('bsSub').textContent=dealDesc;
+    // funnel boxes — show combined
+    document.getElementById('ff1').textContent=Math.round(r.leads).toLocaleString()+(r.liEnabled?' (+'+r.liLeadCount.toLocaleString()+' also on LI)':'');
+    document.getElementById('ff2').textContent=Math.round(r.replies).toLocaleString()+(r.liEnabled?' + LI':'');
+    document.getElementById('ffr2').textContent=document.getElementById('rReply').value+'% email reply rate';
+    document.getElementById('ff3').textContent=Math.round(r.totalMeets).toLocaleString();
+    document.getElementById('ffr3').textContent=r.liEnabled?'email + LinkedIn meetings':'of replies';
+    document.getElementById('ff4').textContent=r.totalDeals.toFixed(1);
+    document.getElementById('ffr4').textContent=document.getElementById('rClose').value+'% win rate';
+    if(advRoiUnlocked) updateAdvRoi();
+
+  },80);
+}
+
+function goPlan(){
+  goStep(3);warnDismissed=false;
+  // clear any lingering plan fit warning
+  const pw=document.getElementById('planWarn'); if(pw) pw.className='plan-warn';
+  const r=R;
+  // sync s3LiSlots from Step 1
+  if(liEnabled) s3LiSlots=parseFloat(document.getElementById('rLiSlots').value)||1;
+  else s3LiSlots=0;
+  document.getElementById('s3LiSlots').textContent=s3LiSlots;
+  document.getElementById('liAdjRow').style.display=liEnabled?'flex':'none';
+  // mailbox
+  document.getElementById('mbDesc').textContent=`${Math.round(r.leads).toLocaleString()} leads × ${r.seq} emails ÷ (22 days × ${r.lim}/mailbox/day):`;
+  document.getElementById('mbCount').textContent=r.mbNeeded;
+  renderFront();renderBack();
+  setTimeout(()=>{updateRoiBlock();updateCostBreakdown();},350);
+  confetti();
+}
+
+// ── FLIP PLAN ─────────────────────────────────────────────────────────────
+function flipPlan(){document.getElementById('planCard').classList.toggle('flipped');}
+
+// ── BILLING ───────────────────────────────────────────────────────────────
+function setBil(b,e){
+  if(e)e.stopPropagation();
+  billing=b;
+  renderFront();
+  updateRoiBlock();updateCostBreakdown();
+  if(b==='monthly'&&!warnDismissed) showMonthlyWarn();
+  else hideWarn();
+}
+
+function showMonthlyWarn(){
+  const cycle=parseFloat(document.getElementById('rCycle').value)||14;
+  let msg;
+  if(cycle>=30){
+    msg="Heads up: your "+cycle+"-day sales cycle means this month's meetings close after billing resets. You pay for the outreach this month; revenue lands next period.";
+  } else if(cycle>=21){
+    msg="With a "+cycle+"-day cycle, some deals spill into next month. A 3-month plan lets you see the full return without renewal pressure.";
+  } else if(cycle>=14){
+    msg="Even at "+cycle+" days, last-week meetings close right as the next invoice lands. Quarterly smooths that out.";
+  } else {
+    msg="Your "+cycle+"-day cycle is short enough for monthly — though quarterly saves 5% for the same commitment.";
+  }
+  document.getElementById('mwBody').textContent=msg;
+  document.getElementById('monthlyWarn').classList.add('show');
+  document.getElementById('mwOverlay').classList.remove('show');
+}
+function dismissWarn(e){
+  e.stopPropagation();warnDismissed=true;hideWarn();
+}
+function hideWarn(){
+  document.getElementById('mwOverlay').classList.remove('show');
+  document.getElementById('monthlyWarn').classList.remove('show');
+  document.getElementById('pfFront').classList.remove('monthly-active');
+}
+
+// ── RENDER FRONT ──────────────────────────────────────────────────────────
+function renderFront(){
+  const p=PLANS[planIdx], pp=prices(p), pr=pp[billing];
+  const pobText=getPob(p,billing);
+  document.getElementById('pfName').textContent=p.name;
+  // badge
+  const obEl=document.getElementById('obBadge');
+  if(pobText){ obEl.style.display='flex'; obEl.innerHTML='<span>'+pobText+'</span>'; }
+  else { obEl.style.display='none'; }
+  // lottery scroll the price — apply discount if active
+  const effPr=planDiscount>0?+(pr*(1-planDiscount/100)).toFixed(2):pr;
+  lotteryScroll(document.getElementById('pfPrice'), effPr, v=>v.toFixed(2));
+  // show/hide discount badge next to price
+  let dbEl=document.getElementById('pfDiscBadge');
+  if(!dbEl){ dbEl=document.createElement('span'); dbEl.id='pfDiscBadge'; dbEl.className='discount-badge'; document.getElementById('pfPrice').parentNode.appendChild(dbEl); }
+  if(planDiscount>0){ dbEl.textContent=planDiscount+'% off'; dbEl.classList.add('show'); }
+  else { dbEl.classList.remove('show'); }
+  const notes={monthly:'Billed monthly · most flexible',quarterly:'Billed every 3 months · save 5% vs monthly',annual:'Billed annually · save 25% vs monthly'};
+  document.getElementById('pfNote').textContent=notes[billing];
+  document.querySelectorAll('.btog').forEach(b=>b.classList.toggle('on',b.dataset.b===billing));
+  const chips=[
+    {t:fN(p.credits)+' credits',c:'pu'},{t:fN(p.rcpt)+' recipients',c:'pu'},
+    {t:'Unlimited campaigns',c:''},{t:'Unlimited follow-ups',c:''},{t:'Sales CRM',c:''},{t:'Email warm-up',c:''},
+  ];
+  if(liEnabled && R.liCost>0) chips.push({t:'+ LinkedIn Automation ('+((R.liCost/69)|0)+' slot'+(R.liCost>69?'s':'')+') $'+R.liCost+'/mo',c:'li'});
+  if(pobText) chips.push({t:pobText,c:'gr'});
+  document.getElementById('pfChips').innerHTML=chips.map(x=>`<div class="chip ${x.c}">${x.t}</div>`).join('');
+}
+
+// ── RENDER BACK ───────────────────────────────────────────────────────────
+function renderBack(){
+  const p=PLANS[planIdx], pp=prices(p);
+  document.getElementById('pbTitle').textContent=`All billing options — ${p.name}`;
+  document.getElementById('planPills').innerHTML='<span>Switch plan:</span>'+
+    PLANS.map((pl,i)=>`<span class="ppill ${i===planIdx?'on':''}" onclick="swPlan(${i},event)">${pl.name}</span>`).join('');
+  const cols=[
+    {label:'Monthly', pr:pp.monthly, note:'Pay month to month',save:null},
+    {label:'3-Month', pr:pp.quarterly,note:'Billed every 3 months',save:'Save 5%'},
+    {label:'Annual',  pr:pp.annual,  note:'Billed once a year',  save:'Save 25%',best:true},
+  ];
+  document.getElementById('bilCols').innerHTML=cols.map(c=>`
+    <div class="bcol ${c.best?'best':''}">
+      ${c.best?'<div class="bcol-tag">Best value</div>':''}
+      <div class="bcol-period">${c.label}</div>
+      <div class="bcol-price">$${c.pr.toFixed(2)}</div>
+      <div class="bcol-note">${c.note}<br/>/mo equivalent</div>
+      ${c.save?`<div class="bcol-save">${c.save}</div>`:''}
+    </div>`).join('');
+}
+
+// ── ROI BLOCK UPDATE (shared by swPlan + setBil) ─────────────────────────
+function updateRoiBlock(){
+  const baseCost=getEffectivePlanCost();
+  const liCostS3=getEffectiveLiaCost();
+  const planCost=baseCost+liCostS3;
+
+  const cycle=parseFloat(document.getElementById('rCycle').value)||R.cycle||14;
+  const dv=parseFloat(document.getElementById('iDeal').value)||R.dv||0;
+  const billingMonths=billing==='annual'?12:billing==='quarterly'?3:1;
+
+  // Correct model: each month runs independently.
+  // R.totalDeals is already monthly deals after the closing-cycle adjustment.
+  // Over N months you do N months of outreach, so N x monthly deals.
+  // Month-by-month accumulation: each month's meetings have a different
+  // closing window depending on how much of the period remains after that month.
+  // Month M (1-indexed): daysRemaining = (billingMonths - M) * 30
+  // closeableFrac(M) = min(1, max(0, daysRemaining + 30 - cycle) / 30)
+  // Raw (pre-cycle) monthly meetings and win rate — read directly from R's funnel
+  // R.totalMeets already has closeableFraction baked in for email-only meets.
+  // We need raw meetings = what the funnel generates before cycle cuts.
+  // R.replies * meetRate = raw email meets; meetRate = R.meets_raw / R.replies
+  // Simplest: read close rate directly from the slider, compute raw meets from R.replies
+  const closeRateRaw = parseFloat(document.getElementById('rClose').value)/100 || 0;
+  const meetRateRaw  = parseFloat(document.getElementById('rMeet').value)/100 || 0;
+  const replyRateRaw = parseFloat(document.getElementById('rReply').value)/100 || 0;
+  const rawMonthlyEmailMeets = (R.leads||0) * replyRateRaw * meetRateRaw;
+  // LI extra meets (also raw, before cycle)
+  const liPctRaw = R.liLeadCount>0 ? R.liLeadCount/(R.leads||1) : 0;
+  const liMrRaw  = parseFloat(document.getElementById('rLiMeet')?document.getElementById('rLiMeet').value:meetRateRaw*100)/100||0;
+  const rawMonthlyLiExtraMeets = Math.max(0,(R.leads||0)*liPctRaw*replyRateRaw*(liMrRaw-meetRateRaw));
+
+  let periodDealsRaw = 0;
+  for(let m=1; m<=billingMonths; m++){
+    const daysLeft = (billingMonths - m) * 30;
+    const frac = Math.min(1, Math.max(0, (daysLeft + 30 - cycle) / 30));
+    periodDealsRaw += (rawMonthlyEmailMeets + rawMonthlyLiExtraMeets) * closeRateRaw * frac;
+  }
+  const periodDeals = roundDeals(periodDealsRaw);
+  const totalPeriodRev = periodDeals * dv;
+  const totalPeriodCost = planCost * billingMonths;
+  const monthlyDeals = R.totalDeals||0;
+  const monthlyRev = monthlyDeals * dv;
+
+  // periodFrac for sub-label: use month 1 fraction as the "this month" indicator
+  const periodFrac = Math.min(1, Math.max(0, (30 - cycle) / 30));
+  const roi=totalPeriodCost>0?totalPeriodRev/totalPeriodCost:0;
+  const net=Math.max(0,totalPeriodRev-totalPeriodCost);
+
+  const mx=Math.max(totalPeriodRev,totalPeriodCost,1);
+  document.getElementById('rbRev').style.width=Math.min(100,totalPeriodRev/mx*100)+'%';
+  document.getElementById('rbCost').style.width=Math.min(100,totalPeriodCost/mx*100)+'%';
+  document.getElementById('rbNet').style.width=Math.min(100,net/mx*100)+'%';
+  lotteryScroll(document.getElementById('roiHlNum'), roi, v=>v>=1?v.toFixed(1)+'×':'<1×');
+
+  // Show period totals on the bars
+  const pLabel=billing==='annual'?' /yr':billing==='quarterly'?' /qtr':'';
+  document.getElementById('rbRevAmt').textContent=fm(totalPeriodRev)+pLabel;
+  document.getElementById('rbCostAmt').textContent=fm(totalPeriodCost)+pLabel;
+  document.getElementById('rbNetAmt').textContent=fm(net)+pLabel;
+
+  const cpm=R.totalMeets>0?planCost/R.totalMeets:null;
+  document.getElementById('s3Cpm').textContent=cpm?fm(cpm):'—';
+  const cpdEl=document.getElementById('s3Cpd');
+  if(cpdEl){ const cpd2=periodDeals>0?(totalPeriodCost/periodDeals):null; cpdEl.textContent=cpd2?fm(cpd2):'—'; }
+
+  // Sub-label: warn if cycle exceeds period
+  const sub=document.getElementById('roiHlSub');
+  if(sub){
+    if(periodFrac===0){
+      sub.textContent='0 deals close — cycle ('+cycle+'d) exceeds billing period';
+      sub.style.color='var(--re)';
+    } else if(periodFrac<1){
+      sub.textContent=Math.round(periodFrac*100)+'% of meetings close in this period';
+      sub.style.color='var(--am)';
+    } else {
+      sub.textContent=liCostS3>0?'incl. $'+liCostS3+'/mo LI':'for every $1 spent';
+      sub.style.color='';
+    }
+  }
+
+  // Populate the ROI flip card breakdown
+  const bkEl=document.getElementById('roiBreakdownContent');
+  if(bkEl){
+    const planName=PLANS[planIdx].name;
+    const liNote=liCostS3>0?' + $'+liCostS3+'/mo LinkedIn':'';
+    const cycleNote=periodFrac<1?'<span style="color:rgba(255,170,44,0.9)">Your '+cycle+'-day closing cycle means only '+Math.round(periodFrac*100)+'% of meetings close within the billing period.</span>':'All meetings closeable within period.';
+    const periodLabel2=billing==='annual'?'/ yr':billing==='quarterly'?'/ qtr':'/ mo';
+    const revenueDrivers=[];
+    if(R.leads) revenueDrivers.push(Math.round(R.leads*billingMonths).toLocaleString()+' leads reached '+periodLabel2);
+    if(R.replies) revenueDrivers.push(Math.round(R.replies*billingMonths).toLocaleString()+' replies ('+Math.round((R.replies/R.leads)*100)+'% reply rate)');
+    if(R.totalMeets) revenueDrivers.push(Math.round(R.totalMeets*billingMonths).toLocaleString()+' meetings booked '+periodLabel2);
+    if(periodDeals) revenueDrivers.push(periodDeals.toFixed(1)+' deals closed this '+billing+' period');
+    const liImpact=R.liExtraMeets>0?'<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);color:rgba(10,200,120,0.85)">LinkedIn adds ~'+Math.round(R.liExtraMeets*billingMonths)+' extra meetings '+periodLabel2+' → '+(R.liDeals*billingMonths).toFixed(1)+' additional deals.</div>':'';
+    const pSuffix=billing==='annual'?' /yr':billing==='quarterly'?' /qtr':'';
+    const cycleTag=periodFrac<1
+      ?'<span style="margin-left:6px;font-size:9px;background:rgba(255,170,44,0.2);color:rgba(255,170,44,0.9);border-radius:4px;padding:1px 5px;vertical-align:middle">'+cycle+'d cycle</span>'
+      :'';
+    const trow=(label,val,highlight)=>
+      '<tr>'
+      +'<td style="padding:5px 0 5px 0;font-size:11px;color:rgba(255,255,255,0.38);width:90px;vertical-align:top">'+label+'</td>'
+      +'<td style="padding:5px 0 5px 8px;font-family:\'JetBrains Mono\',monospace;font-size:13px;font-weight:600;color:'+(highlight||'#fff')+';text-align:right">'+val+pSuffix+'</td>'
+      +'</tr>';
+    const divider='<tr><td colspan="2" style="padding:3px 0"><div style="border-top:1px solid rgba(255,255,255,0.07)"></div></td></tr>';
+    bkEl.innerHTML=
+      '<table style="width:100%;border-collapse:collapse">'
+      +trow('Leads',Math.round((R.leads||0)*billingMonths).toLocaleString())
+      +trow('Replies',Math.round((R.replies||0)*billingMonths).toLocaleString())
+      +trow('Meetings',Math.round((R.totalMeets||0)*billingMonths).toLocaleString())
+      +trow('Deals won',periodDeals+cycleTag)
+      +divider
+      +trow('Plan cost',fm(totalPeriodCost),'rgba(155,130,238,0.8)')
+      +trow('Revenue',fm(totalPeriodRev),'rgba(155,130,238,0.8)')
+      +trow('Net',fm(net),'rgba(52,211,153,0.9)')
+      +'</table>'
+      +(liImpact||'');
+  }
+
+    // ROI discouraging trigger — compare net value of this period vs annual
+  const discouragEl=document.getElementById('roiDiscourage');
+  if(discouragEl && billing!=='annual'){
+    const annualMonthlyCost=prices(PLANS[planIdx]).annual+liCostS3;
+    const annualNet=Math.max(0,monthlyRev*12-annualMonthlyCost*12);
+    const thisNetAnnualised=net*(12/billingMonths);
+    if(annualNet>thisNetAnnualised*1.15 && net>0){
+      const extra=fm(annualNet-thisNetAnnualised);
+      const msgs={
+        monthly:"Switching to annual adds "+extra+" more net value over 12 months — same outreach, lower per-month cost.",
+        quarterly:"Annual would add "+extra+" more net over a year versus renewing quarterly. The discount compounds.",
+      };
+      discouragEl.textContent=msgs[billing]||'';
+      discouragEl.style.display='block';
+    } else {
+      discouragEl.style.display='none';
+    }
+  } else if(discouragEl){
+    discouragEl.style.display='none';
+  }
+
+}
+function swPlan(i,e){
+  if(e)e.stopPropagation();
+  planIdx=i;
+  renderFront();renderBack();updateRoiBlock();updateCostBreakdown();checkPlanFit();
+}
+
+function adjustLiSlots(delta){
+  s3LiSlots=Math.max(0,s3LiSlots+delta);
+  document.getElementById('s3LiSlots').textContent=s3LiSlots;
+  updateCostBreakdown();
+  updateRoiBlock();
+}
+
+function getEffectivePlanCost(){
+  // applies active discount on top of billing-period price
+  const base=getPlanCost();
+  return planDiscount>0 ? +(base*(1-planDiscount/100)).toFixed(2) : base;
+}
+function getEffectiveLiaCost(){
+  const base=s3LiSlots*69;
+  return liaDiscount>0 ? +(base*(1-liaDiscount/100)).toFixed(2) : base;
+}
+
+function updateCostBreakdown(){
+  const p=PLANS[planIdx];
+  const planCostBase=getPlanCost();
+  const planCostEff=getEffectivePlanCost();
+  const liaCostEff=getEffectiveLiaCost();
+  const total=planCostEff+liaCostEff;
+  // annual totals
+  const billingMultiplier=billing==='annual'?12:billing==='quarterly'?3:1;
+  const periodLabel=billing==='annual'?'/ year':billing==='quarterly'?'/ quarter':'/ month';
+
+  const rows=[];
+  // Plan row — show strikethrough if discounted
+  const planLabel=p.name+' plan ('+billing+')';
+  const planValHtml=planDiscount>0
+    ? `<span style="text-decoration:line-through;color:var(--td);font-size:12px">$${planCostBase.toFixed(2)}</span> <span style="color:var(--gr)">$${planCostEff.toFixed(2)}</span>`
+    : `$${planCostEff.toFixed(2)}`;
+  rows.push({label:planLabel, valHtml:planValHtml});
+
+  if(s3LiSlots>0){
+    const liaBase=s3LiSlots*69;
+    const liaValHtml=liaDiscount>0
+      ? `<span style="text-decoration:line-through;color:var(--td);font-size:12px">$${liaBase}</span> <span style="color:var(--gr)">$${liaCostEff.toFixed(2)}</span>`
+      : `$${liaCostEff.toFixed(2)}`;
+    rows.push({label:'LinkedIn Automation ('+s3LiSlots+' slot'+(s3LiSlots>1?'s':'')+')', valHtml:liaValHtml});
+  }
+
+  document.getElementById('cbRows').innerHTML=rows.map(r=>`
+    <div class="cb-row"><div class="cb-row-label">${r.label}</div><div class="cb-row-val">${r.valHtml}</div></div>
+  `).join('');
+
+  // Total mo + period total
+  const periodTotal=(total*billingMultiplier).toFixed(2);
+  const totalHtml=billing==='monthly'
+    ? `<span id="cbTotalVal">$${total.toFixed(2)}</span><span style="font-size:13px;color:var(--tm);margin-left:6px">/mo</span>`
+    : `<span id="cbTotalVal">$${total.toFixed(2)}</span><span style="font-size:13px;color:var(--tm);margin-left:6px">/mo &nbsp;·&nbsp; <strong style="color:var(--tx)">$${periodTotal}</strong> ${periodLabel}</span>`;
+  document.getElementById('cbTotal').innerHTML=totalHtml;
+
+  // Discount reveal line
+  const discEl=document.getElementById('cbDiscountNote');
+  if(discountActive && discEl){
+    const fullTotal=(getPlanCost()+(s3LiSlots*69));
+    const saved=(fullTotal-total).toFixed(2);
+    const selfDepLines=[
+      "You typed a magic word into a sales tool and got money off. You have found your calling.",
+      "This discount was not approved by anyone. Not even me, really. Enjoy.",
+      "Somewhere a Snov.io finance person just felt a chill and doesn't know why.",
+      "I built this calculator. I hid a secret. You found it. We are now enemies who respect each other.",
+      "Technically this violates three internal pricing policies. Let's keep this between us.",
+      "The audacity. The nerve. The discount. Congratulations, I guess.",
+      "Most people just pay full price. You are not most people. You are a problem. A cheaper problem.",
+    ];
+    // Deterministic based on total savings so it doesn't flicker on re-render
+    const lineIdx=Math.floor(saved)%selfDepLines.length;
+    const savedPeriod=(parseFloat(saved)*billingMultiplier).toFixed(2);
+    const savedLabel=billing==='monthly'?'$'+saved+'/mo':'$'+savedPeriod+' '+periodLabel;
+    const fullPeriodTotal=(fullTotal*billingMultiplier).toFixed(2);
+    discEl.innerHTML=
+      '<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--b1)">'
+      +'<div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gr);margin-bottom:8px">🎉 Discount applied</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px">'
+      +'<div style="font-size:13px;color:var(--tm)">You pay</div>'
+      +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:20px;font-weight:800;color:var(--tx)">$'+total.toFixed(2)+'<span style="font-size:13px;font-weight:400;color:var(--tm)">/mo</span></div>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px">'
+      +'<div style="font-size:13px;color:var(--gr);font-weight:600">You save</div>'
+      +'<div style="font-family:\'JetBrains Mono\',monospace;font-size:16px;font-weight:700;color:var(--gr)">'+savedLabel+'</div>'
+      +'</div>'
+      +'<div style="font-size:11px;color:var(--td);font-style:italic;line-height:1.55">'+selfDepLines[lineIdx]+'</div>'
+      +'</div>';
+    discEl.style.display='block';
+  } else if(discEl){
+    discEl.style.display='none';
+  }
+
+  // show/hide LI adjuster
+  document.getElementById('liAdjRow').style.display=liEnabled?'flex':'none';
+
+  // nudge message based on slot change vs original
+  const impactEl=document.getElementById('liRoiImpact');
+  const origSlots=liEnabled?(R.liCost/69):0;
+  if(liEnabled && s3LiSlots===0){
+    // removed all LI — negative nudge
+    impactEl.className='li-roi-impact show';
+    impactEl.style.color='var(--re)';
+    impactEl.textContent=`Removing LinkedIn cuts ~${Math.round(R.liDeals)} deals/mo from your pipeline. Your outreach just lost its second channel.`;
+  } else if(liEnabled && s3LiSlots<origSlots){
+    // reduced — gentle negative nudge
+    const lost=((origSlots-s3LiSlots)/origSlots*R.liDeals).toFixed(1);
+    impactEl.className='li-roi-impact show';
+    impactEl.style.color='var(--am)';
+    impactEl.textContent=`Fewer slots = fewer connection requests. You're leaving ~${lost} LI deals/mo on the table.`;
+  } else if(liEnabled && s3LiSlots>origSlots){
+    // increased — positive nudge
+    const scaleFactor=s3LiSlots/Math.max(origSlots,1);
+    const projDeals=(R.liDeals*scaleFactor).toFixed(1);
+    const newRoi=R.rev>0&&(planCostEff+liaCostEff)>0?(R.rev/(planCostEff+liaCostEff)).toFixed(1):'—';
+    impactEl.className='li-roi-impact show';
+    impactEl.style.color='var(--gr)';
+    impactEl.textContent=`More slots → more reach. Scaling to ${s3LiSlots} projects ~${projDeals} LI deals/mo. Adjusted ROI: ~${newRoi}×.`;
+  } else {
+    impactEl.className='li-roi-impact';
+    impactEl.style.color='';
+  }
+}
+
+// ── AI INSIGHT ───────────────────────────────────────────────────────────
+async function generateAiInsight(r){
+  const wrap=document.getElementById('aiInsightWrap');
+  const txt=document.getElementById('aiInsightText');
+  if(!wrap||!txt) return;
+  txt.textContent='';
+  txt.classList.add('loading');
+  const liLine=r.liEnabled
+    ? `LinkedIn is also enabled: ${r.liLeadCount} leads on LI → ${Math.round(r.liExtraMeets)} extra meetings → ${r.liDeals.toFixed(1)} extra deals.`
+    : 'LinkedIn is not enabled.';
+  const prompt=`You are a concise sales analyst. Based on these outreach numbers, write ONE sentence (max 30 words) of honest, specific, not salesy insight. Do not use generic praise. Be precise and a little dry.
+
+Numbers: ${Math.round(r.leads)} leads/month, ${(r.replies/r.leads*100).toFixed(1)}% reply rate (${Math.round(r.replies)} replies), ${(r.meets/Math.max(r.replies,1)*100).toFixed(1)}% meeting rate (${Math.round(r.meets)} meetings), ${(r.deals/Math.max(r.meets,1)*100).toFixed(1)}% win rate (${r.deals.toFixed(1)} deals), $${r.dv} avg deal, $${fm(r.rev)} possible monthly revenue. ${liLine}
+
+Reply with only the insight sentence. No quotes, no preamble.`;
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:80,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await res.json();
+    const text=(data.content&&data.content[0]&&data.content[0].text)||'';
+    txt.classList.remove('loading');
+    // stream-type it in character by character for effect
+    txt.textContent='';
+    let i=0;
+    const interval=setInterval(()=>{
+      if(i<text.length){ txt.textContent+=text[i++]; } else clearInterval(interval);
+    },18);
+  } catch(e){
+    txt.classList.remove('loading');
+    txt.textContent='Your funnel is set up. The math looks reasonable — the only variable left is execution.';
+  }
+}
+
+// ── DISCOUNT PANEL ───────────────────────────────────────────────────────
+function applyDiscount(){
+  planDiscount=Math.min(80,Math.max(0,parseFloat(document.getElementById('dpPlanDisc').value)||0));
+  liaDiscount=Math.min(80,Math.max(0,parseFloat(document.getElementById('dpLiaDisc').value)||0));
+  discountActive=planDiscount>0||liaDiscount>0;
+  document.getElementById('dpBadge').classList.toggle('show',discountActive);
+  renderFront();updateRoiBlock();updateCostBreakdown();
+}
+function toggleDiscountPanel(){
+  document.getElementById('discountPanel').classList.toggle('show');
+}
+// ── ROI FLIP CARD — visible only after typing "snov" ─────────────────────
+let roiCardFlipped=false, roiFlipUnlocked=false;
+function flipRoiCard(){
+  if(!roiFlipUnlocked) return;
+  roiCardFlipped=!roiCardFlipped;
+  document.getElementById('roiFlipCard').style.transform=roiCardFlipped?'rotateY(180deg)':'rotateY(0deg)';
+}
+
+// "snov" keyword: first press unlocks, every subsequent press toggles the flip
+(function(){
+  let snovBuf='';
+  document.addEventListener('keydown',e=>{
+    if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+    snovBuf=(snovBuf+e.key).toLowerCase().slice(-4);
+    if(snovBuf==='snov'){
+      snovBuf='';
+      if(!roiFlipUnlocked){
+        roiFlipUnlocked=true;
+        const scene=document.getElementById('roiFlipScene');
+        if(scene) scene.style.cursor='pointer';
+        const hint=document.getElementById('roiFlipHint');
+        if(hint) hint.style.display='block';
+        const card=document.getElementById('roiFlipCard');
+        if(card){
+          card.style.boxShadow='0 0 0 2px rgba(155,130,238,0.6)';
+          setTimeout(()=>{ card.style.boxShadow=''; },700);
+        }
+      }
+      flipRoiCard();
+    }
+  });
+})();
+
+// ── DISCOUNT PANEL — activated by typing "magic" ───────────────────────────
+// Trigger: URL param ?snovadmin=1 OR typing "magic" (any case) anywhere
+(function(){
+  if(new URLSearchParams(window.location.search).get('snovadmin')==='1'){
+    document.getElementById('discountPanel').classList.add('show');
+  }
+  let magicBuf='';
+  document.addEventListener('keydown',e=>{
+    // ignore when typing in an input/textarea
+    if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+    magicBuf=(magicBuf+e.key).toLowerCase().slice(-5);
+    if(magicBuf==='magic'){ toggleDiscountPanel(); magicBuf=''; }
+  });
+})();
+
+// ── CONFETTI ──────────────────────────────────────────────────────────────
+function confetti(){
+  const w=document.getElementById('confWrap');
+  const cls=['#6C47FF','#8B6FFF','#22D97A','#A990FF','#FFAA2C','#fff'];
+  for(let i=0;i<60;i++){
+    const el=document.createElement('div');el.className='conf';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${cls[~~(Math.random()*cls.length)]};width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1.4+Math.random()*2.4}s;animation-delay:${Math.random()*.9}s;transform:rotate(${Math.random()*360}deg)`;
+    w.appendChild(el);el.addEventListener('animationend',()=>el.remove());
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+document.querySelectorAll('input[type=range]').forEach(r=>updateTrack(r));
+syncNewLeads();
+calcJourney();
+// ensure LI section hidden on load
+document.getElementById('liSection').classList.remove('show');
+</script>
+<div id="roiDiscourage" style="display:none"></div>
+<div id="roiHlSub" style="display:none"></div>
+<div id="s3Cpd" style="display:none"></div>
+<div id="aiInsightWrap" style="display:none"><div id="aiInsightText"></div></div>
+<span id="lblLiDaily" style="display:none"></span>
+<span id="liDailyCalc" style="display:none"></span>
+<span id="liMonthlyCalc" style="display:none"></span>
+<input id="ljrate3" type="number" value="33" style="display:none"/>
+</body>
+</html>
